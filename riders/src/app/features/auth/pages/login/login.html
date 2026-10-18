@@ -1,1 +1,32 @@
-<p>login works!</p>
+<div class="flex justify-center items-center h-screen">
+  <hlm-card class="w-150">
+    <!-- HEADER -->
+    <hlm-card-header>
+      <div class="text-center">
+        <h3 hlmCardTitle>MadRiders AI</h3>
+        <p hlmCardDescription class="mt-4">Ingresa a tu consola de telemetría y rutas inteligentes</p>
+      </div>
+    </hlm-card-header>
+
+    <!-- CONTENT BUTTONS -->
+    <div hlmCardContent class="flex flex-col items-center h-100">
+      <div hlmButtonGroup>
+        <button class="w-50" hlmBtn [variant]="variantButtonLoggin()" (click)="action.set(availableAcions.LOGIN)">Iniciar sesión</button>
+        <button hlmBtn class="w-50" [variant]="variantButtonRegister()" (click)="action.set(availableAcions.SIGNUP)">Nuevo Rider</button>
+      </div>
+
+      @if(action() == availableAcions.LOGIN){
+        <div class="mt-4">
+          <app-signin />
+        </div>
+      }@else{
+        <div class="mt-4">
+          <app-signup />
+        </div>
+      }
+    </div>
+    <hlm-card-footer class="justify-center">
+      <p hlmCardDescription class="mt-4 text-xs">Sincronización certificada con Garmin XT, BMW Motorrad Coneected y TomTom Rider</p>
+    </hlm-card-footer>
+  </hlm-card>
+</div>
