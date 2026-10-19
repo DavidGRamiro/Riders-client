@@ -2,7 +2,7 @@ import { HttpEvent, HttpHandlerFn, HttpRequest } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment as env} from "../../../environments/environment.development";
 import { inject } from "@angular/core";
-import { UserStore } from "../../features/auth/store/user.store";
+import { AuthStore } from "../../features/auth/store/auth.store";
 
 
 export function requestInterceptor(
@@ -10,8 +10,8 @@ export function requestInterceptor(
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {  
 
-  const _userStore = inject(UserStore)
-  const token = _userStore.accessToken();
+  const _authStore = inject(AuthStore)
+  const token = _authStore.accessToken();
   
   const isLoginUrl = req.url.includes('login')
   const BASE_URL = `${env.URL_BACKEND}${req.url}` 

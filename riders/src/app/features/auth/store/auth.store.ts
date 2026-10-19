@@ -11,7 +11,7 @@ const initialState : LoginStore = {
   refreshToken: ''
 }
 
-export const UserStore = signalStore( 
+export const AuthStore = signalStore( 
   { providedIn: 'root' },
   
   withState(initialState),
@@ -29,11 +29,11 @@ export const UserStore = signalStore(
     // Setear el token de refresco en casa Login.
     setRefreshToken( newRefresh : string){
       patchState(store, { refreshToken: newRefresh }); 
+    },
+
+    // Setear ambos tokens
+    setTokens(access: string, refresh: string){
+      patchState(store,{accessToken: access, refreshToken: refresh })
     }
   }))
-
-
-
-
-
 )
