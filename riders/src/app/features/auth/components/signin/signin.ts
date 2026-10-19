@@ -9,11 +9,13 @@ import { lucideMail } from '@ng-icons/lucide';
 import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
 import { HlmLabel } from '@spartan-ng/helm/label';
 import { faSolidArrowRight } from '@ng-icons/font-awesome/solid';
+import { LoginRequest } from '../../interfaces/login.interface';
+import { form, FormField, required, FormRoot } from '@angular/forms/signals';
 
 
 @Component({
   selector: 'app-signin',
-  imports: [HlmButton, NgIcon, HlmSeparatorImports, HlmInputGroupImports, HlmCheckboxImports, HlmLabel],
+  imports: [HlmButton, NgIcon, HlmSeparatorImports, HlmInputGroupImports, HlmCheckboxImports, HlmLabel, FormField, FormRoot],
   templateUrl: './signin.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideIcons({ faBrandApple, faBrandGoogle, lucideMail, faEye, faEyeSlash, faSolidArrowRight })]
@@ -24,6 +26,27 @@ export class Signin {
   public passwordType = computed(() => this.toggle() ? 'text' : 'password' ) 
 
   private toggle = signal<boolean>(false);
+
+  public loginModel = signal<LoginRequest>({
+    username: '',
+    password: ''
+  });
+
+  public loginForm = form(this.loginModel, (schema) => {
+    required( schema.username, { message: 'El nombre de usuario es requerido'}),
+    required( schema.password, { message: 'La contraseña es obligatoria' })
+    },
+    {
+      submission : {
+        action: async (field) => {
+          // TODO: Llamada a servidor
+          console.log(field().value());
+        }
+          
+        },
+      }
+  )
+
 
   public showPassword(){
     this.toggle.set(!this.toggle())
