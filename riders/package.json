@@ -33,6 +33,7 @@
     "@ng-icons/core": "^32.2.0",
     "@ng-icons/font-awesome": "^36.1.0",
     "@ng-icons/lucide": "^32.2.0",
+    "@ngrx/signals": "^22.0.1",
     "@spartan-ng/brain": "^1.6.1",
     "@tanstack/angular-charts": "0.16.0",
     "@tanstack/charts": "0.16.0",
