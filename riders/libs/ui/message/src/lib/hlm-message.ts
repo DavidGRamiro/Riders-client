@@ -16,6 +16,6 @@ export class HlmMessage {
 	public readonly align = input<MessageAlign>('start');
 
 	constructor() {
-		classes(() => 'gap-3 text-sm group/message relative flex w-full min-w-0 data-[align=end]:flex-row-reverse');
+		classes(() => 'gap-2.5 text-sm group/message relative flex w-full min-w-0 data-[align=end]:flex-row-reverse');
 	}
 }

@@ -7,6 +7,6 @@ import { classes } from '@spartan-ng/helm/utils';
 })
 export class HlmInputOtpGroup {
 	constructor() {
-		classes(() => 'has-data-[matches-spartan-invalid=true]:ring-destructive/20 dark:has-data-[matches-spartan-invalid=true]:ring-destructive/40 has-data-[matches-spartan-invalid=true]:border-destructive rounded-3xl has-data-[matches-spartan-invalid=true]:ring-3 flex items-center');
+		classes(() => 'has-data-[matches-spartan-invalid=true]:ring-destructive/20 dark:has-data-[matches-spartan-invalid=true]:ring-destructive/40 has-data-[matches-spartan-invalid=true]:border-destructive rounded-md has-data-[matches-spartan-invalid=true]:ring-3 flex items-center');
 	}
 }
