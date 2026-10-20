@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmButtonGroup } from '@spartan-ng/helm/button-group';
 import { HlmButton } from '@spartan-ng/helm/button';
-import { LoginAction } from '../../enums/login';
+import { LoginAction } from '../../enums/login.enum';
 import { Signin } from '../../components/signin/signin';
 import { Signup } from '../../components/signup/signup';
 

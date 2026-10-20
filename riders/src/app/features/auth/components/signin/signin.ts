@@ -17,6 +17,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { lucideBadgeAlert } from '@ng-icons/lucide';
 import { toast } from '@spartan-ng/brain/sonner';
 import { AuthStore } from '../../store/auth.store';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -31,6 +32,7 @@ export class Signin {
   // Servicio / Store
   private _auth = inject(Auth)
   private _authStore = inject(AuthStore)
+  private _router = inject(Router)
 
   // Variables de control de estado input password
   public isVisible = computed(() => this.toggle() ? 'faEye' : 'faEyeSlash');
@@ -57,7 +59,7 @@ export class Signin {
           try {
             const { access, refresh } = await firstValueFrom(this._auth.authenticate(field().value()))
             this._authStore.setTokens(access, refresh);
-            // TODO: Navegar a pagina principal
+            this._router.navigate(['/main'])
           } catch (err: unknown) {
             const { error } = err as HttpErrorResponse
              toast.error(error.detail)
