@@ -1,7 +1,7 @@
 
-<div class="p-2 gap-4 flex">
-  <div class="flex">
-     <!-- Logo -->
+<div class="sticky top-0 z-50 flex items-center justify-between gap-4 bg-background/50 p-2 backdrop-blur-xl backdrop-saturate-150" >
+  <!-- Logo -->
+  <div>
      <div>
        <button
          hlmBtn
@@ -21,60 +21,90 @@
          />
        </button>
      </div>
-     <!-- Menús -->
-     <div class="flex items-center">
-       <nav hlmNavigationMenu openOn="click">
-         <ul hlmNavigationMenuList class="flex-wrap gap-2">
-           <li hlmNavigationMenuItem>
-             <a hlmNavigationMenuLink href="/">Rutas</a>
-           </li>
-           <li hlmNavigationMenuItem>
-             <a hlmNavigationMenuLink href="/">Eventos & Quedadas</a>
-           </li>
-           <li hlmNavigationMenuItem>
-             <a hlmNavigationMenuLink href="/">Comunidad Riders</a>
-           </li>
-           <li hlmNavigationMenuItem>
-             <a hlmNavigationMenuLink href="/">Mi garage</a>
-           </li>
-         </ul>
-       </nav>
-     </div>
   </div>
-  <div class="flex ml-auto justify-end-safe items-center">
+  <!-- Menús -->
+  <div>
+    <nav hlmNavigationMenu openOn="click">
+      <ul hlmNavigationMenuList class="flex-wrap gap-2">
+        <li hlmNavigationMenuItem>
+          <a hlmNavigationMenuLink href="/">Rutas</a>
+        </li>
+        <li hlmNavigationMenuItem>
+          <a hlmNavigationMenuLink href="/">Eventos & Quedadas</a>
+        </li>
+        <li hlmNavigationMenuItem>
+          <a hlmNavigationMenuLink href="/">Comunidad Riders</a>
+        </li>
+        <li hlmNavigationMenuItem>
+          <a hlmNavigationMenuLink href="/">Mi garage</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <!-- Buscador/LightDarkMode/Profile -->
+  <div class="flex gap-2">
     <!-- Buscador TODO: Seria interesante crearlo en un componente independendiente --> 
-    <hlm-autocomplete [(search)]="search">
-      <hlm-autocomplete-input placeholder="Buscador de rutas" />
-      <hlm-autocomplete-content *hlmAutocompletePortal>
-        <hlm-autocomplete-status class="justify-start">
-          @if (options.error(); as error) {
-          {{ error }}
-          } @else if (options.isLoading()) {
-          <hlm-spinner />
-          Buscando rutas...
-          } @else if (search().length === 0) {
-            Escribe la Comunidad Autónoma..
-          } @else if (options.hasValue() && options.value().length === 0) {
-          La ruta en "{{ search() }}" todavia no existe. Creala !
-          } @else if (options.hasValue()) {
-          {{ options.value().length }} resultados.
-          }
-        </hlm-autocomplete-status>
-    
-        <div hlmAutocompleteList>
-          @if (options.hasValue()) {
-          @for (option of options.value(); track $index) {
-          <hlm-autocomplete-item [value]="option">
-            <div class="flex flex-col gap-1">
-              <p>{{ option.title }}</p>
-              <p class="text-muted-foreground text-xs">{{ option.year }}</p>
-            </div>
-          </hlm-autocomplete-item>
-          }
-          }
-        </div>
-      </hlm-autocomplete-content>
-    </hlm-autocomplete>
+    <div class="">
+      <hlm-autocomplete [(search)]="search">
+        <hlm-autocomplete-input placeholder="Buscador de rutas" />
+        <hlm-autocomplete-content *hlmAutocompletePortal>
+          <hlm-autocomplete-status class="justify-start">
+            @if (options.error(); as error) {
+            {{ error }}
+            } @else if (options.isLoading()) {
+            <hlm-spinner />
+            Buscando rutas...
+            } @else if (search().length === 0) {
+              Escribe la Comunidad Autónoma..
+            } @else if (options.hasValue() && options.value().length === 0) {
+            La ruta en "{{ search() }}" todavia no existe. Creala !
+            } @else if (options.hasValue()) {
+            {{ options.value().length }} resultados.
+            }
+          </hlm-autocomplete-status>
+      
+          <div hlmAutocompleteList>
+            @if (options.hasValue()) {
+            @for (option of options.value(); track $index) {
+            <hlm-autocomplete-item [value]="option">
+              <div class="flex flex-col gap-1">
+                <p>{{ option.title }}</p>
+                <p class="text-muted-foreground text-xs">{{ option.year }}</p>
+              </div>
+            </hlm-autocomplete-item>
+            }
+            }
+          </div>
+        </hlm-autocomplete-content>
+      </hlm-autocomplete>
+    </div>
+    <!-- Toggle Theme -->
+     <div class="">
+      <button hlmBtn size="icon" variant="outline" class="rounded-full" (click)="theme.toggle()">
+        <ng-icon [name]="theme.icon" />
+      </button>
+     </div>
+     <!-- Profile -->
+    <div class="">
+      <button hlmBtn variant="ghost" size="icon" class="rounded-full" [hlmDropdownMenuTrigger]="menu">
+        <hlm-avatar>
+          <img hlmAvatarImage src="/assets/avatar.png" alt="@spartan-ui logo" />
+          <span hlmAvatarFallback>DG</span>
+        </hlm-avatar>
+      </button>
+      
+      <ng-template #menu>
+        <hlm-dropdown-menu>
+          <hlm-dropdown-menu-group>
+            <button hlmDropdownMenuItem>Perfil</button>
+            <button hlmDropdownMenuItem>Ajustes</button>
+          </hlm-dropdown-menu-group>
+          <hlm-dropdown-menu-separator />
+          <hlm-dropdown-menu-group>
+            <button hlmDropdownMenuItem variant="destructive">Log out</button>
+          </hlm-dropdown-menu-group>
+        </hlm-dropdown-menu>
+      </ng-template>
+    </div>
   </div>
-
 </div>
