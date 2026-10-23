@@ -21,7 +21,4 @@ export class Login {
   public variantButtonRegister = computed(() => { return this.action() === LoginAction.SIGNUP ? 'default' : 'outline' })
 
   protected readonly availableAcions = LoginAction
-
-
-
 } 
