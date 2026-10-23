@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Navbar } from '../../components';
+import { UserStore } from '../../../shared';
 
 @Component({
   selector: 'app-main',

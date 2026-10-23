@@ -11,7 +11,7 @@ const initialState : LoginStore = {
   refreshToken: ''
 }
 
-export const AuthStore = signalStore( 
+export const AuthStore = signalStore(
   { providedIn: 'root' },
   
   withState(initialState),

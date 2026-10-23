@@ -18,6 +18,7 @@ import { lucideBadgeAlert } from '@ng-icons/lucide';
 import { toast } from '@spartan-ng/brain/sonner';
 import { AuthStore } from '../../store/auth.store';
 import { Router } from '@angular/router';
+import { UserStore } from '../../../../shared';
 
 
 @Component({
@@ -30,13 +31,14 @@ import { Router } from '@angular/router';
 export class Signin {
 
   // Servicio / Store
-  private _auth = inject(Auth)
-  private _authStore = inject(AuthStore)
-  private _router = inject(Router)
+  private _auth = inject(Auth);
+  private _authStore = inject(AuthStore);
+  private _userStore = inject(UserStore);
+  private _router = inject(Router);
 
   // Variables de control de estado input password
   public isVisible = computed(() => this.toggle() ? 'faEye' : 'faEyeSlash');
-  public passwordType = computed(() => this.toggle() ? 'text' : 'password' ) 
+  public passwordType = computed(() => this.toggle() ? 'text' : 'password' ) ;
   private toggle = signal<boolean>(false);
 
   // Inittial State para el formulario de login.
@@ -57,8 +59,9 @@ export class Signin {
       submission : {
         action: async (field) => {
           try {
-            const { access, refresh } = await firstValueFrom(this._auth.authenticate(field().value()))
+            const { access, refresh, extra_data } = await firstValueFrom(this._auth.authenticate(field().value()))
             this._authStore.setTokens(access, refresh);
+            this._userStore.setUser(extra_data)
             this._router.navigate(['/main'])
           } catch (err: unknown) {
             const { error } = err as HttpErrorResponse
