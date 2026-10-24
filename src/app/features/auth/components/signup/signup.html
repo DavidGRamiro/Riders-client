@@ -1,1 +1,60 @@
-sign up works
+<div class="flex flex-col w-100">
+
+  <div class="mt-2">
+    <hlm-field-group class="grid grid-cols-2">
+      <hlm-field class="gap-1">
+        <label hlmFieldLabel for="name">Nombre</label>
+        <input hlmInput id="name" type="text" placeholder="Alejandro" required />
+      </hlm-field>
+
+      <hlm-field class="gap-1">
+        <label hlmFieldLabel for="username">Nombre de usuario</label>
+        <hlm-input-group>
+          <input hlmInputGroupInput id="username" placeholder="alexRider"  required/>
+          <hlm-input-group-addon align="inline-start">
+            <ng-icon name="lucideUserCircle2" />
+          </hlm-input-group-addon>
+        </hlm-input-group>
+      </hlm-field>
+    </hlm-field-group>
+
+    <hlm-field class="gap-1">
+      <label hlmFieldLabel for="lastname">Apellidos</label>
+      <input hlmInput id="lastname" type="text" placeholder="Martín Suarez" required />
+    </hlm-field>
+
+    <hlm-field class="gap-1">
+      <label hlmFieldLabel for="email">Correo Electrónico</label>
+      <input hlmInput id="email" type="email" placeholder="alex@gmail.com" />
+    </hlm-field>
+  </div>
+
+  <div class="mt-4">
+    <hlm-field>
+      <hlm-toggle-group variant="outline" spacing="2" size="lg" value="all">
+        @for (types of typesOfBikes; track $index) {
+        <button hlmToggleGroupItem [value]="types.value"
+          class="flex h-16 min-w-0 flex-1 flex-col items-center justify-center rounded-xl">
+          <ng-icon [name]="types.icon" size="1.5rem"></ng-icon>
+          <span class="text-muted-foreground text-xs">{{ types.label}}</span>
+        </button>
+        }
+      </hlm-toggle-group>
+    </hlm-field>
+  </div>
+
+  <div class="mt-4">
+    <hlm-field>
+      <hlm-toggle-group variant="default" spacing="2" size="lg" value="all">
+        @for (license of licenses; track $index) {
+        <button hlmToggleGroupItem [value]="license.value" variant="default"
+          class="flex h-12 min-w-0 flex-1 flex-col items-center justify-center rounded-xl">
+          <span class="text-muted-foreground text-xs">{{ license.label}}</span>
+        </button>
+        }
+      </hlm-toggle-group>
+    </hlm-field>
+  </div>
+
+
+</div>
