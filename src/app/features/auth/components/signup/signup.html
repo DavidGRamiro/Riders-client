@@ -1,111 +1,83 @@
-<div class="flex flex-col w-100">
+<form [formRoot]="signUpForm">
+  <div class="flex flex-col w-100 gap-3">
 
-  <div class="mt-2">
-    <hlm-field-group class="grid grid-cols-2">
-      <hlm-field class="gap-1">
-        <label hlmFieldLabel for="name">Nombre</label>
-        <input hlmInput id="name" type="text" placeholder="Alejandro" required  autocomplete="user"/>
+    <div>
+      <hlm-field-group class="grid grid-cols-2">
+        <hlm-field class="gap-1">
+          <label hlmFieldLabel for="name">Nombre</label>
+          <input hlmInput id="name" type="text" placeholder="Alejandro"  autocomplete="user" [formField]="signUpForm.name" />
+        </hlm-field>
+
+        <hlm-field class="gap-1">
+          <label hlmFieldLabel for="username">Nombre de usuario</label>
+          <hlm-input-group>
+            <input hlmInputGroupInput id="username" placeholder="alexRider"  autocomplete="user" [formField]="signUpForm.username">
+            <hlm-input-group-addon align="inline-start">
+              <ng-icon name="lucideUserCircle2" />
+            </hlm-input-group-addon>
+          </hlm-input-group>
+        </hlm-field>
+      </hlm-field-group>
+
+      <hlm-field class="gap-1 mt-2">
+        <label hlmFieldLabel for="lastname">Apellidos</label>
+        <input hlmInput id="lastname" type="text" placeholder="Martín Suarez" autocomplete="user" [formField]="signUpForm.last_name" />
       </hlm-field>
 
-      <hlm-field class="gap-1">
-        <label hlmFieldLabel for="username">Nombre de usuario</label>
+      <hlm-field class="gap-1 mt-2">
+        <label hlmFieldLabel for="email">Correo Electrónico</label>
+        <input hlmInput id="email" type="email" placeholder="alex@gmail.com" autocomplete="user" [formField]="signUpForm.email" />
+      </hlm-field>
+    </div>
+
+    <div>
+      <hlm-field-group class="grid grid-cols-2 gap-1">
         <hlm-input-group>
-          <input hlmInputGroupInput id="username" placeholder="alexRider"  required autocomplete="user">
-          <hlm-input-group-addon align="inline-start">
-            <ng-icon name="lucideUserCircle2" />
+          <input hlmInputGroupInput [type]="passwordType()" placeholder="Contraseña"
+            (input)="onPasswordChange($event)" [formField]="signUpForm.password" />
+          <hlm-input-group-addon align="inline-end">
+            <button hlmInputGroupButton title="password" (click)="showPassword()" size="icon-xs">
+              <ng-icon [name]="isVisible()"></ng-icon>
+            </button>
           </hlm-input-group-addon>
         </hlm-input-group>
-      </hlm-field>
-    </hlm-field-group>
-
-    <hlm-field class="gap-1 mt-2">
-      <label hlmFieldLabel for="lastname">Apellidos</label>
-      <input hlmInput id="lastname" type="text" placeholder="Martín Suarez" required autocomplete="user"/>
-    </hlm-field>
-
-    <hlm-field class="gap-1 mt-2">
-      <label hlmFieldLabel for="email">Correo Electrónico</label>
-      <input hlmInput id="email" type="email" placeholder="alex@gmail.com" />
-    </hlm-field>
-  </div>
-  
-  <div class="mt-4">
-    <hlm-field-group class="grid grid-cols-2 gap-1">
-      <hlm-input-group>
-        <input hlmInputGroupInput [type]="passwordType()" placeholder="Contraseña" (input)="onPasswordChange($event)"/>
-        <hlm-input-group-addon align="inline-end">
-          <button hlmInputGroupButton title="password" (click)="showPassword()" size="icon-xs">
-            <ng-icon [name]="isVisible()"></ng-icon>
-          </button>
-        </hlm-input-group-addon>
-      </hlm-input-group>
 
         <hlm-input-group>
-          <input hlmInputGroupInput type="password" placeholder="Confirmar contraseña" />
+          <input hlmInputGroupInput type="password" placeholder="Confirmar contraseña"/>
         </hlm-input-group>
-    </hlm-field-group>
-  </div>
+      </hlm-field-group>
+    </div>
 
-  <div class="mt-2">
-    <hlm-progress [value]="indicatorValue()" max="100">
-      <hlm-progress-indicator [class]="indicatorClass()" />
-    </hlm-progress>
-  </div>
+    <div>
+      <hlm-progress [value]="indicatorValue()" max="100">
+        <hlm-progress-indicator [class]="indicatorClass()" />
+      </hlm-progress>
+    </div>
 
-  <div class="flex items-center gap-3 mt-2">
-    <hlm-checkbox inputId="terms" />
-    <label  class="text-xs" hlmLabel for="terms">Acepto los términos de servicio y la política de privacidad</label>
-  </div>
+    <div class="flex items-center gap-3">
+      <hlm-checkbox inputId="terms" />
+      <label class="text-xs" hlmLabel for="terms">Acepto los términos de servicio y la política de privacidad</label>
+    </div>
 
-  <div class="mt-4">
-    <button hlmBtn size="lg" class="w-100">Crear cuenta Rider</button>
-  </div>
+    <div>
+      <button hlmBtn size="lg" class="w-100" type="submit">Crear cuenta Rider</button>
+    </div>
 
-  <div class="mt-2">
-    <div hlmMarker variant="separator">
-      <span hlmMarkerContent>o continuar con</span>
+    <div>
+      <div hlmMarker variant="separator">
+        <span hlmMarkerContent>o continuar con</span>
+      </div>
+    </div>
+
+    <div class="flex w-100 gap-4">
+      <button hlmBtn variant="outline" class="cursor-pointer">
+        <ng-icon name="faBrandApple"></ng-icon>
+        Continuar con Apple
+      </button>
+      <button hlmBtn variant="outline" class="cursor-pointer">
+        <ng-icon name="faBrandGoogle"></ng-icon>
+        Continuar con Google
+      </button>
     </div>
   </div>
-
-  <div class="flex mt-4 w-100 gap-4">
-    <button hlmBtn variant="outline" class="cursor-pointer">
-      <ng-icon name="faBrandApple"></ng-icon>
-      Continuar con Apple
-    </button>
-    <button hlmBtn variant="outline" class="cursor-pointer">
-      <ng-icon name="faBrandGoogle"></ng-icon>
-      Continuar con Google
-    </button>
-  </div>
-
-
-
-<!-- 
-
-  <div class="mt-4">
-    <hlm-field>
-      <hlm-toggle-group variant="outline" spacing="2" size="lg" value="all">
-        @for (types of typesOfBikes; track $index) {
-        <button hlmToggleGroupItem [value]="types.value"
-          class="flex h-16 min-w-0 flex-1 flex-col items-center justify-center rounded-xl">
-          <ng-icon [name]="types.icon" size="1.5rem"></ng-icon>
-          <span class="text-muted-foreground text-xs">{{ types.label}}</span>
-        </button>
-        }
-      </hlm-toggle-group>
-    </hlm-field>
-  </div>
-
-  <div class="mt-4">
-    <hlm-field>
-      <hlm-toggle-group spacing="2" size="lg" value="all">
-        @for (license of licenses; track $index) {
-        <button hlmToggleGroupItem [value]="license.value" variant="default"
-          class="flex h-12 min-w-0 flex-1 flex-col items-center justify-center rounded-xl">
-          <span class="text-muted-foreground text-xs">{{ license.label}}</span>
-        </button>
-        }
-      </hlm-toggle-group>
-    </hlm-field>
-  </div> -->
-</div>
+</form>

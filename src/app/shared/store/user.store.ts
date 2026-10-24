@@ -3,14 +3,14 @@ import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
 
 interface UserState {
     username : string;
-    is_active: boolean;
-    email: string;  
+    is_online: boolean;
+    email?: string;  
     authenticated : boolean; 
 }
 
 const initialState : UserState = {
     username : '',
-    is_active: false,
+    is_online: false,
     email: '',
     authenticated : false
 }

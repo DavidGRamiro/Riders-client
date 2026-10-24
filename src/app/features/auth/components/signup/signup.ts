@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  inject,
   signal,
 } from "@angular/core";
 import { HlmInputImports } from "@spartan-ng/helm/input";
@@ -25,6 +26,16 @@ import { HlmProgressImports } from "@spartan-ng/helm/progress";
 import { HlmCheckboxImports } from "@spartan-ng/helm/checkbox";
 import { HlmMarkerImports } from "@spartan-ng/helm/marker";
 import { faBrandApple, faBrandGoogle } from "@ng-icons/font-awesome/brands";
+import { form, required, FormRoot, FormField } from "@angular/forms/signals";
+import { SignUpRequest } from "../../interfaces/login.interface";
+import { Auth } from "../../services/auth";
+import { debounceTime, firstValueFrom, of } from "rxjs";
+import { AuthStore } from "../../store/auth.store";
+import { UserStore } from "../../../../shared";
+import { HttpErrorResponse } from "@angular/common/http";
+import { toast } from "@spartan-ng/brain/sonner";
+import { Router } from "@angular/router";
+
 
 @Component({
   selector: "app-signup",
@@ -41,7 +52,9 @@ import { faBrandApple, faBrandGoogle } from "@ng-icons/font-awesome/brands";
     HlmProgressImports,
     HlmCheckboxImports,
     HlmMarkerImports,
-  ],
+    FormRoot,
+    FormField
+],
   templateUrl: "./signup.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: provideIcons({
@@ -65,6 +78,11 @@ export class Signup {
   private toggle = signal<boolean>(false);
   private password = signal<string>("");
 
+  private _auth = inject(Auth);
+  private _authStore = inject(AuthStore);
+  private _userStore = inject(UserStore);
+  private _router = inject(Router);
+
   // FIXME: Temporal data until the issue #8 is resolved
   public typesOfBikes = [
     { value: "trail", label: "Trail", icon: "lucideMountainSnow" },
@@ -80,6 +98,42 @@ export class Signup {
     { value: "a1", label: "Permiso A1/B" },
     { value: "am", label: "Permiso AM" },
   ];
+
+  public signUpModel = signal<SignUpRequest>({
+    name: "",
+    last_name: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  public signUpForm = form(
+    this.signUpModel,
+    (schema) => {
+      required(schema.name, { message: "El nombre es requerido" });
+      required(schema.username, {message: "El nombre de usuario es requerido" });
+      required(schema.last_name, { message: "Los apellidos son requeridos" });
+      required(schema.email, { message: "El correo es requerido" });
+      required(schema.password, { message: "La contraseña es requerida" });
+    },
+    {
+      submission: {
+        action: async (field) => {
+          try {
+            const { token, refresh, user, is_online } = await firstValueFrom(this._auth.register(field().value()));
+            this._authStore.setTokens(token, refresh);
+            this._userStore.setUser( { username: user, is_online, authenticated: true });
+
+            // TODO: Manage delay and set up spinner view
+            this._router.navigate(['/main']);
+          } catch (err: unknown) {
+            const { error } = err as HttpErrorResponse;
+            toast.error(error.detail);
+          }
+        },
+      },
+    },
+  );
 
   constructor() {
     effect(() => {
