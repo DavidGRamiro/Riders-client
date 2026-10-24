@@ -13,12 +13,13 @@ export function requestInterceptor(
   const _authStore = inject(AuthStore)
   const token = _authStore.accessToken();
   
-  const isLoginUrl = req.url.includes('login')
+  const isLoginUrl = req.url.includes('login');
+  const isNewUser = req.url.includes('/user') && req.method === 'POST';
   const BASE_URL = `${env.URL_BACKEND}${req.url}` 
   
   let request = req;
 
-  if(isLoginUrl){
+  if(isLoginUrl || isNewUser){
     request = req.clone({ url: BASE_URL })
   }else{
     request = req.clone({
