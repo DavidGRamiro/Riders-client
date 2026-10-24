@@ -1,1 +1,83 @@
-sign up works
+<form [formRoot]="signUpForm">
+  <div class="flex flex-col w-100 gap-3">
+
+    <div>
+      <hlm-field-group class="grid grid-cols-2">
+        <hlm-field class="gap-1">
+          <label hlmFieldLabel for="name">Nombre</label>
+          <input hlmInput id="name" type="text" placeholder="Alejandro"  autocomplete="user" [formField]="signUpForm.name" />
+        </hlm-field>
+
+        <hlm-field class="gap-1">
+          <label hlmFieldLabel for="username">Nombre de usuario</label>
+          <hlm-input-group>
+            <input hlmInputGroupInput id="username" placeholder="alexRider"  autocomplete="user" [formField]="signUpForm.username">
+            <hlm-input-group-addon align="inline-start">
+              <ng-icon name="lucideUserCircle2" />
+            </hlm-input-group-addon>
+          </hlm-input-group>
+        </hlm-field>
+      </hlm-field-group>
+
+      <hlm-field class="gap-1 mt-2">
+        <label hlmFieldLabel for="lastname">Apellidos</label>
+        <input hlmInput id="lastname" type="text" placeholder="Martín Suarez" autocomplete="user" [formField]="signUpForm.last_name" />
+      </hlm-field>
+
+      <hlm-field class="gap-1 mt-2">
+        <label hlmFieldLabel for="email">Correo Electrónico</label>
+        <input hlmInput id="email" type="email" placeholder="alex@gmail.com" autocomplete="user" [formField]="signUpForm.email" />
+      </hlm-field>
+    </div>
+
+    <div>
+      <hlm-field-group class="grid grid-cols-2 gap-1">
+        <hlm-input-group>
+          <input hlmInputGroupInput [type]="passwordType()" placeholder="Contraseña"
+            (input)="onPasswordChange($event)" [formField]="signUpForm.password" />
+          <hlm-input-group-addon align="inline-end">
+            <button hlmInputGroupButton title="password" (click)="showPassword()" size="icon-xs">
+              <ng-icon [name]="isVisible()"></ng-icon>
+            </button>
+          </hlm-input-group-addon>
+        </hlm-input-group>
+
+        <hlm-input-group>
+          <input hlmInputGroupInput type="password" placeholder="Confirmar contraseña"/>
+        </hlm-input-group>
+      </hlm-field-group>
+    </div>
+
+    <div>
+      <hlm-progress [value]="indicatorValue()" max="100">
+        <hlm-progress-indicator [class]="indicatorClass()" />
+      </hlm-progress>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <hlm-checkbox inputId="terms" />
+      <label class="text-xs" hlmLabel for="terms">Acepto los términos de servicio y la política de privacidad</label>
+    </div>
+
+    <div>
+      <button hlmBtn size="lg" class="w-100" type="submit">Crear cuenta Rider</button>
+    </div>
+
+    <div>
+      <div hlmMarker variant="separator">
+        <span hlmMarkerContent>o continuar con</span>
+      </div>
+    </div>
+
+    <div class="flex w-100 gap-4">
+      <button hlmBtn variant="outline" class="cursor-pointer">
+        <ng-icon name="faBrandApple"></ng-icon>
+        Continuar con Apple
+      </button>
+      <button hlmBtn variant="outline" class="cursor-pointer">
+        <ng-icon name="faBrandGoogle"></ng-icon>
+        Continuar con Google
+      </button>
+    </div>
+  </div>
+</form>
