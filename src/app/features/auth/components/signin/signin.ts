@@ -62,7 +62,7 @@ export class Signin {
             const { access, refresh, extra_data } = await firstValueFrom(this._auth.authenticate(field().value()))
             this._authStore.setTokens(access, refresh);
             this._userStore.setUser(extra_data)
-            this._router.navigate(['/main'])
+            this._router.navigate(['/home'])
           } catch (err: unknown) {
             const { error } = err as HttpErrorResponse
              toast.error(error.detail)

@@ -3,9 +3,9 @@ import { Navbar } from '../../components';
 import { UserStore } from '../../../shared';
 
 @Component({
-  selector: 'app-main',
+  selector: 'app-home',
   imports: [Navbar],
-  templateUrl: './main.html',
+  templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Main {}
+export class Home {}
