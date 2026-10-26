@@ -125,7 +125,7 @@ export class Signup {
             this._userStore.setUser( { username: user, is_online, authenticated: true });
 
             // TODO: Manage delay and set up spinner view
-            this._router.navigate(['/main']);
+            this._router.navigate(['/home']);
           } catch (err: unknown) {
             const { error } = err as HttpErrorResponse;
             toast.error(error.detail);
