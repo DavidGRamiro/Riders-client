@@ -9,7 +9,7 @@
          variant="ghost"
          class="size-13 cursor-pointer rounded"
          aria-label="MadRiders AI - Ir al inicio"
-         href="/main"
+         routerLink="/home"
        >
          <img
            ngSrc="/riders_logo.png"
@@ -27,16 +27,16 @@
     <nav hlmNavigationMenu openOn="click">
       <ul hlmNavigationMenuList class="flex-wrap gap-2">
         <li hlmNavigationMenuItem>
-          <a hlmNavigationMenuLink href="/">Rutas</a>
+          <a hlmNavigationMenuLink routerLink="/routes">Rutas</a>
         </li>
         <li hlmNavigationMenuItem>
-          <a hlmNavigationMenuLink href="/">Eventos & Quedadas</a>
+          <a hlmNavigationMenuLink routerLink="/events">Eventos & Quedadas</a>
         </li>
         <li hlmNavigationMenuItem>
-          <a hlmNavigationMenuLink href="/">Comunidad Riders</a>
+          <a hlmNavigationMenuLink routerLink="/comunity">Comunidad Riders</a>
         </li>
         <li hlmNavigationMenuItem>
-          <a hlmNavigationMenuLink href="/">Mi garage</a>
+          <a hlmNavigationMenuLink routerLink="/garage">Mi garage</a>
         </li>
       </ul>
     </nav>

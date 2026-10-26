@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Navbar } from '../../components';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-home',
-  imports: [Navbar],
+  imports: [],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
