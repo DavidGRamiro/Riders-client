@@ -11,11 +11,12 @@ import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { lucideMoon } from '@ng-icons/lucide';
 import { Theme } from '../../services';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-navbar',
-  imports: [HlmNavigationMenuImports, HlmButtonImports, NgOptimizedImage, HlmAutocompleteImports, HlmSpinnerImports, NgIcon, HlmTooltipImports, HlmAvatarImports, HlmDropdownMenuImports],
+  imports: [HlmNavigationMenuImports, HlmButtonImports, NgOptimizedImage, HlmAutocompleteImports, HlmSpinnerImports, NgIcon, HlmTooltipImports, HlmAvatarImports, HlmDropdownMenuImports, RouterLink],
   templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideIcons({ lucideSunMedium, lucideMoon })],
