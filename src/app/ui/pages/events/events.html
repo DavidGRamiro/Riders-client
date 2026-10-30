@@ -1,1 +1,399 @@
-<p>events works!</p>,
+<section class="mx-auto flex w-full max-w-[1600px] flex-col gap-10 px-4 py-8 lg:px-6">
+  <header class="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <span
+          class="inline-flex items-center rounded border border-border/70 bg-card/60 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+        >
+          Telemetry Active
+        </span>
+        <span class="flex items-center gap-2 text-xs text-muted-foreground">
+          <span class="size-1.5 rounded-full bg-emerald-400"></span>
+          Radar de rutas abierto
+        </span>
+      </div>
+
+      <h1 class="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+        Eventos &amp; Kedadas de Ruta
+      </h1>
+
+      <p class="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+        Explora salidas organizadas por la comunidad, trazadas con curvatura analizada por modelos
+        de IA y telemetría de asfalto compartida en tiempo real.
+      </p>
+    </div>
+
+    <button
+      hlmBtn
+      type="button"
+      size="lg"
+      class="h-12 shrink-0 gap-2 self-start rounded-lg px-5 text-sm font-semibold xl:self-auto"
+    >
+      <ng-icon name="lucidePlus" class="size-4" />
+      Crear Nueva Ruta / Evento
+    </button>
+  </header>
+
+  <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Filtros de eventos">
+        @for (filter of filters; track filter.id) {
+          <button
+            hlmBtn
+            type="button"
+            size="sm"
+            [attr.aria-pressed]="selectedFilter() === filter.id"
+            [class]="
+              selectedFilter() === filter.id
+                ? 'h-10 rounded-md border-transparent bg-white px-4 text-sm font-medium text-neutral-950 hover:bg-white/90'
+                : 'h-10 rounded-md border-border/60 bg-white/[0.03] px-4 text-sm font-medium text-muted-foreground hover:bg-white/[0.06] hover:text-foreground'
+            "
+            (click)="selectFilter(filter.id)"
+          >
+            {{ filter.label }}
+          </button>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <div class="relative">
+          <label for="event-search" class="sr-only">Filtrar por puerto o destino</label>
+          <ng-icon
+            name="lucideSearch"
+            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            id="event-search"
+            type="search"
+            placeholder="Filtrar por puerto o destino..."
+            [value]="searchTerm()"
+            (input)="updateSearch($event)"
+            class="h-11 w-full rounded-lg border border-border/60 bg-white/[0.03] pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 sm:w-[280px]"
+          />
+        </div>
+
+        <div class="relative">
+          <label for="event-sort" class="sr-only">Ordenar eventos</label>
+          <ng-icon
+            name="lucideCalendarDays"
+            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <select
+            id="event-sort"
+            [value]="sortOrder()"
+            (change)="updateSort($event)"
+            class="h-11 w-full appearance-none rounded-lg border border-border/60 bg-white/[0.03] pl-10 pr-10 text-sm text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 sm:w-[230px]"
+          >
+            <option value="date">Fecha más próxima</option>
+            <option value="seats">Más plazas disponibles</option>
+          </select>
+          <ng-icon
+            name="lucideChevronDown"
+            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (filteredEvents().length === 0) {
+    <div
+      class="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 bg-card/30 px-6 py-16 text-center"
+    >
+      <span
+        class="flex size-11 items-center justify-center rounded-full border border-border/60 bg-background/40 text-muted-foreground"
+      >
+        <ng-icon name="lucideCompass" class="size-5" />
+      </span>
+      <p class="text-sm font-medium text-foreground">No hay kedadas que coincidan con tu búsqueda</p>
+      <p class="max-w-sm text-xs text-muted-foreground">
+        Prueba con otro puerto, destino o cambia los filtros activos.
+      </p>
+      <button
+        hlmBtn
+        type="button"
+        variant="outline"
+        size="sm"
+        class="mt-1 rounded-md"
+        (click)="selectFilter('all')"
+      >
+        Ver todas las rutas
+      </button>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
+      @for (event of filteredEvents(); track event.id) {
+        <article
+          class="group flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card/40 transition-colors hover:border-border"
+        >
+          <div class="relative h-[220px] w-full overflow-hidden">
+            <img
+              [ngSrc]="event.image"
+              fill
+              [alt]="event.imageAlt"
+              sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+              class="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-black/80"
+              aria-hidden="true"
+            ></div>
+
+            <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-4">
+              <span
+                [class]="
+                  'rounded border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] backdrop-blur ' +
+                  event.categoryClass
+                "
+              >
+                {{ event.category }}
+              </span>
+
+              <div class="flex flex-wrap items-start justify-end gap-2">
+                <span
+                  class="inline-flex items-center gap-1.5 rounded bg-black/55 px-2 py-1 text-[11px] font-medium text-white/90 backdrop-blur"
+                >
+                  <ng-icon [name]="event.weather.icon" class="size-3.5 text-white/80" />
+                  {{ event.weather.temperature }} · {{ event.weather.condition }}
+                </span>
+                <span
+                  class="rounded bg-black/55 px-2 py-1 text-[11px] font-medium text-white/80 backdrop-blur"
+                >
+                  {{ event.date }}
+                </span>
+              </div>
+            </div>
+
+            <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+              <span class="flex min-w-0 items-center gap-2 text-xs font-medium text-white/90">
+                <span
+                  class="flex size-5 shrink-0 items-center justify-center rounded-full border border-white/25 bg-black/40"
+                >
+                  <ng-icon name="lucideFlag" class="size-3" />
+                </span>
+                <span class="truncate">{{ event.start }} → {{ event.end }}</span>
+              </span>
+              <span
+                [class]="
+                  'shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] ' +
+                  event.telemetryClass
+                "
+              >
+                {{ event.telemetry }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-1 flex-col gap-5 p-5">
+            <div class="flex items-start justify-between gap-3">
+              <h2 class="text-xl font-semibold leading-snug text-foreground">
+                {{ event.title }}
+              </h2>
+              <span
+                [class]="
+                  'shrink-0 rounded border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ' +
+                  event.paceClass
+                "
+              >
+                {{ event.pace }}
+              </span>
+            </div>
+
+            <p class="text-sm leading-relaxed text-muted-foreground">
+              {{ event.description }}
+            </p>
+
+            <div class="rounded-lg border border-border/50 bg-background/30 p-3">
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+                >
+                  <ng-icon name="lucideMilestone" class="size-3.5" />
+                  Waypoints Clave
+                </span>
+                <span class="text-[10px] text-muted-foreground">{{ event.waypointCount }}</span>
+              </div>
+              <p class="mt-2 truncate text-xs text-muted-foreground">
+                @for (waypoint of event.waypoints; track waypoint; let last = $last) {
+                  <span>{{ waypoint }}</span>
+                  @if (!last) {
+                    <span class="px-1 text-muted-foreground/60">→</span>
+                  }
+                }
+              </p>
+            </div>
+
+            <div
+              class="grid grid-cols-4 divide-x divide-border/50 overflow-hidden rounded-lg border border-border/50 bg-background/20"
+            >
+              <div class="flex flex-col gap-1 px-3 py-2.5">
+                <span
+                  class="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                >
+                  Distancia
+                </span>
+                <span class="text-sm font-semibold leading-none text-foreground">
+                  {{ event.distance }}
+                </span>
+              </div>
+              <div class="flex flex-col gap-1 px-3 py-2.5">
+                <span
+                  class="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                >
+                  Tiempo
+                </span>
+                <span class="text-sm font-semibold leading-none text-foreground">
+                  {{ event.time }}
+                </span>
+              </div>
+              <div class="flex flex-col gap-1 px-3 py-2.5">
+                <span
+                  class="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                >
+                  Curvas
+                </span>
+                <span class="text-sm font-semibold leading-none text-foreground">
+                  {{ event.curves }}
+                </span>
+              </div>
+              <div class="flex flex-col gap-1 px-3 py-2.5">
+                <span
+                  class="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                >
+                  Desnivel
+                </span>
+                <span class="text-sm font-semibold leading-none text-foreground">
+                  {{ event.elevation }}
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-auto flex flex-col gap-4">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex min-w-0 items-center gap-2.5">
+                  <span
+                    [class]="
+                      'flex size-9 shrink-0 items-center justify-center rounded-full border border-border/60 text-[11px] font-semibold ' +
+                      event.author.avatarClass
+                    "
+                  >
+                    {{ event.author.initials }}
+                  </span>
+                  <span class="flex min-w-0 flex-col">
+                    <span class="flex items-center gap-1 text-xs font-semibold text-foreground">
+                      {{ event.author.name }}
+                      <ng-icon
+                        name="lucideCircleCheck"
+                        class="size-3.5 text-sky-400"
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <span class="truncate text-[11px] text-muted-foreground">
+                      {{ event.author.handle }}
+                    </span>
+                  </span>
+                </div>
+
+                <div class="flex shrink-0 items-center">
+                  @for (follower of event.followers; track follower; let index = $index) {
+                    <span
+                      [class]="
+                        'flex size-6 items-center justify-center rounded-full border border-card bg-white/10 text-[9px] font-semibold text-white/80 ' +
+                        (index > 0 ? '-ml-2' : '')
+                      "
+                    >
+                      {{ follower }}
+                    </span>
+                  }
+                  @if (event.extraFollowers > 0) {
+                    <span
+                      class="-ml-2 flex size-6 items-center justify-center rounded-full border border-card bg-white/[0.06] text-[9px] font-semibold text-muted-foreground"
+                    >
+                      +{{ event.extraFollowers }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between gap-2">
+                  <span
+                    [class]="
+                      event.urgent
+                        ? 'text-[11px] font-semibold text-amber-400'
+                        : 'text-[11px] text-muted-foreground'
+                    "
+                  >
+                    {{ event.urgent ? event.urgentLabel : 'Plazas confirmadas' }}
+                  </span>
+                  <span class="text-[11px] tabular-nums text-muted-foreground">
+                    {{ event.confirmed }} / {{ event.total }} plazas
+                  </span>
+                </div>
+                <div
+                  class="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]"
+                  role="progressbar"
+                  [attr.aria-label]="'Plazas ocupadas de ' + event.title"
+                  [attr.aria-valuenow]="occupancy(event)"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  <div
+                    [class]="
+                      'h-full rounded-full transition-all ' +
+                      (event.urgent ? 'bg-amber-400' : 'bg-white/80')
+                    "
+                    [style.width.%]="occupancy(event)"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-[auto_1fr] gap-2">
+                <button
+                  hlmBtn
+                  type="button"
+                  variant="outline"
+                  class="h-11 gap-2 rounded-lg px-4 text-sm font-medium"
+                  [attr.aria-label]="'Descargar GPX de ' + event.title"
+                >
+                  <ng-icon name="lucideDownload" class="size-4" />
+                  GPX
+                </button>
+                <button
+                  hlmBtn
+                  type="button"
+                  [class]="
+                    'h-11 gap-2 rounded-lg text-sm font-semibold ' +
+                    (event.ctaVariant === 'accent'
+                      ? 'bg-amber-400 text-neutral-950 hover:bg-amber-300'
+                      : 'bg-white text-neutral-950 hover:bg-white/90')
+                  "
+                >
+                  {{ event.ctaLabel }}
+                  <ng-icon
+                    [name]="event.ctaVariant === 'accent' ? 'lucideZap' : 'lucideArrowRight'"
+                    class="size-4"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <footer class="mt-2 border-t border-border/60 py-6">
+    <div
+      class="flex flex-col gap-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© 2025 ApexRoute Architecture. Distribuido para pilotos y exploradores.</p>
+      <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Enlaces del pie de página">
+        <a href="#" class="transition-colors hover:text-foreground">Telemetría</a>
+        <a href="#" class="transition-colors hover:text-foreground">API Protocol</a>
+        <a href="#" class="transition-colors hover:text-foreground">Estado del Sistema</a>
+        <a href="#" class="transition-colors hover:text-foreground">Privacidad</a>
+      </nav>
+    </div>
+  </footer>
+</section>
