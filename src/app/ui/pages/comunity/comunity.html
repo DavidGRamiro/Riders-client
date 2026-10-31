@@ -1,1 +1,619 @@
-<p>comunity works!</p>,
+<section class="flex w-full flex-col">
+  <div class="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 pt-8 sm:px-6 xl:px-8">
+    <p
+      class="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+    >
+      <span class="size-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
+      Comunidad activa · 4.320 riders conectados
+    </p>
+
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div class="flex flex-col gap-3">
+        <h1 class="text-4xl font-bold tracking-tight text-foreground sm:text-5xl xl:text-6xl">
+          Comunidad &amp; Hub de Riders
+        </h1>
+        <p class="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          El punto de encuentro para motoristas técnicos. Tracks GPX verificados, telemetría de
+          inclinación en puertos de montaña, fotografía cinemática y debates de mecánica pura.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-md bg-white px-5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 lg:self-auto"
+      >
+        <ng-icon name="lucidePlus" class="size-4" aria-hidden="true" />
+        Publicar Experiencia / Ruta
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-6 border-y border-border/60 bg-white/[0.03]">
+    <div
+      class="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-2.5 sm:px-6 xl:flex-row xl:items-center xl:justify-between xl:px-8"
+    >
+      <div
+        class="-mx-2 flex items-center gap-1 overflow-x-auto px-2"
+        role="tablist"
+        aria-label="Secciones de la comunidad"
+      >
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            role="tab"
+            [attr.id]="'community-tab-' + tab.id"
+            [attr.aria-controls]="'community-tab-panel'"
+            [attr.aria-selected]="selectedTab() === tab.id"
+            [class]="
+              selectedTab() === tab.id
+                ? 'inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-white bg-white px-3 text-sm font-semibold text-zinc-900'
+                : 'inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-transparent px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground'
+            "
+            (click)="selectTab(tab.id)"
+          >
+            <ng-icon [name]="tab.icon" class="size-4" aria-hidden="true" />
+            {{ tab.label }}
+            @if (tab.count) {
+              <span
+                class="rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-muted-foreground"
+              >
+                {{ tab.count }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+
+      <div class="relative w-full shrink-0 xl:w-72">
+        <label for="community-filter" class="sr-only">Filtrar por moto o modelo</label>
+        <ng-icon
+          name="lucideSlidersHorizontal"
+          class="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <input
+          id="community-filter"
+          type="search"
+          placeholder="Filtrar por moto, modelo..."
+          [value]="searchTerm()"
+          (input)="updateSearch($event)"
+          class="h-9 w-full rounded-md border border-border/60 bg-background/40 pl-9 pr-14 text-xs text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        />
+        <kbd
+          class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-border/60 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground"
+        >
+          ⌘K
+        </kbd>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="community-tab-panel"
+    role="tabpanel"
+    [attr.aria-labelledby]="'community-tab-' + selectedTab()"
+    class="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 py-6 sm:px-6 xl:grid xl:grid-cols-[minmax(0,1.95fr)_minmax(0,1fr)] xl:items-start xl:px-8"
+  >
+    <div class="flex min-w-0 flex-col gap-6">
+      <div hlmCard class="gap-0 overflow-hidden py-0">
+        <div class="flex items-start gap-3 p-4">
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-white/[0.05] font-mono text-[11px] font-semibold tracking-[0.08em] text-foreground"
+          >
+            AR
+          </span>
+          <label for="community-composer" class="sr-only">Publicar en la comunidad</label>
+          <textarea
+            id="community-composer"
+            rows="2"
+            [value]="draft()"
+            (input)="updateDraft($event)"
+            placeholder="¿Qué puerto o tramo has conquistado hoy? Comparte tus sensaciones o track GPX..."
+            class="min-h-16 w-full resize-none rounded-md border border-border/60 bg-background/40 px-3 py-2 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          ></textarea>
+        </div>
+
+        <div
+          class="flex flex-col gap-3 border-t border-border/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex flex-wrap items-center gap-1">
+            <button
+              type="button"
+              class="inline-flex h-8 items-center gap-1.5 rounded border border-border/60 bg-transparent px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+            >
+              <ng-icon name="lucideImage" class="size-3.5" aria-hidden="true" />
+              Foto
+            </button>
+            <button
+              type="button"
+              class="inline-flex h-8 items-center gap-1.5 rounded border border-border/60 bg-transparent px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+            >
+              <ng-icon name="lucideRoute" class="size-3.5" aria-hidden="true" />
+              GPX Track
+            </button>
+            <button
+              type="button"
+              class="inline-flex h-8 items-center gap-1.5 rounded border border-border/60 bg-transparent px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+            >
+              <ng-icon name="lucideActivity" class="size-3.5" aria-hidden="true" />
+              Telemetría
+            </button>
+            <button
+              type="button"
+              class="inline-flex h-8 items-center gap-1.5 rounded border border-border/60 bg-transparent px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+            >
+              <ng-icon name="lucideBike" class="size-3.5" aria-hidden="true" />
+              Montura
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="inline-flex h-8 shrink-0 items-center rounded-md bg-white px-4 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="!draft().trim()"
+            (click)="publishDraft()"
+          >
+            Publicar
+          </button>
+        </div>
+      </div>
+
+      @if (filteredPosts().length === 0) {
+        <div
+          class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/70 bg-card/40 px-6 py-12 text-center"
+        >
+          <p class="text-sm font-medium text-foreground">No hay publicaciones con ese filtro</p>
+          <p class="text-xs text-muted-foreground">
+            Prueba con otra moto, modelo o limpia la búsqueda.
+          </p>
+        </div>
+      } @else {
+        @for (post of filteredPosts(); track post.id) {
+          <article hlmCard class="gap-0 overflow-hidden py-0">
+            <div class="flex items-start justify-between gap-3 p-4 sm:p-5">
+              <div class="flex min-w-0 items-start gap-3">
+                <span
+                  class="flex size-10 shrink-0 items-center justify-center rounded-md border border-border/60 bg-white/[0.05] font-mono text-[11px] font-semibold tracking-[0.08em] text-foreground"
+                >
+                  {{ post.author.initials }}
+                </span>
+
+                <div class="flex min-w-0 flex-col gap-1">
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <h2 class="text-sm font-semibold text-foreground sm:text-base">
+                      {{ post.author.name }}
+                    </h2>
+                    <span class="font-mono text-[10px] text-muted-foreground">
+                      {{ post.author.handle }}
+                    </span>
+                    <span
+                      [class]="
+                        'rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] ' +
+                        post.author.badgeClass
+                      "
+                    >
+                      {{ post.author.badge }}
+                    </span>
+                  </div>
+                  <p class="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <ng-icon name="lucideBike" class="size-3.5" aria-hidden="true" />
+                    {{ post.author.moto }}
+                    <span class="text-border" aria-hidden="true">·</span>
+                    {{ post.author.time }}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="flex size-8 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                [attr.aria-label]="'Más opciones de la publicación de ' + post.author.name"
+              >
+                <ng-icon name="lucideMoreHorizontal" class="size-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 px-4 pb-3 sm:px-5">
+              @for (tag of post.tags; track tag.label) {
+                <span
+                  [class]="
+                    'inline-flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] ' +
+                    (tag.tone === 'success'
+                      ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400'
+                      : 'border-border/60 bg-white/[0.02] text-muted-foreground')
+                  "
+                >
+                  @if (tag.icon) {
+                    <ng-icon [name]="tag.icon" class="size-3" aria-hidden="true" />
+                  }
+                  {{ tag.label }}
+                </span>
+              }
+            </div>
+
+            <p class="px-4 pb-4 text-sm leading-relaxed text-foreground/90 sm:px-5">
+              {{ post.body }}
+            </p>
+
+            @if (post.telemetry; as telemetry) {
+              <div class="grid grid-cols-1 border-y border-border/60 md:grid-cols-2">
+                <div class="relative min-h-72 overflow-hidden md:min-h-80">
+                  <img
+                    [ngSrc]="telemetry.image.src"
+                    fill
+                    [alt]="telemetry.image.alt"
+                    sizes="(min-width: 1280px) 45vw, 100vw"
+                    class="object-cover grayscale"
+                  />
+                  <div
+                    class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"
+                    aria-hidden="true"
+                  ></div>
+                  <span
+                    class="absolute left-3 top-3 rounded border border-white/15 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/85 backdrop-blur"
+                  >
+                    {{ telemetry.overlay }}
+                  </span>
+                </div>
+
+                <div class="flex flex-col gap-3 border-t border-white/10 bg-[#111113] p-4 md:border-l md:border-t-0">
+                  <div
+                    class="flex items-center justify-between gap-3 border-b border-white/10 pb-3"
+                  >
+                    <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-200">
+                      {{ telemetry.title }}
+                    </p>
+                    <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500">
+                      {{ telemetry.subtitle }}
+                    </span>
+                  </div>
+
+                  @for (metric of telemetry.metrics; track metric.label) {
+                    <div class="flex flex-col gap-1.5">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="font-mono text-[10px] text-zinc-400">{{ metric.label }}</span>
+                        <span class="font-mono text-[10px] font-semibold text-zinc-100">
+                          {{ metric.value }}
+                        </span>
+                      </div>
+                      <div class="h-1 w-full overflow-hidden rounded-full bg-white/10">
+                        <div
+                          class="h-full rounded-full bg-zinc-200"
+                          [style.width.%]="metric.progress"
+                        ></div>
+                      </div>
+                    </div>
+                  }
+
+                  <div class="grid grid-cols-2 gap-3 border-t border-white/10 pt-3">
+                    @for (reading of telemetry.readings; track reading.label) {
+                      <div class="flex flex-col gap-0.5">
+                        <span class="font-mono text-[9px] text-zinc-500">{{ reading.label }}</span>
+                        <span
+                          [class]="
+                            'font-mono text-[11px] font-medium ' +
+                            (reading.tone === 'success' ? 'text-emerald-400' : 'text-zinc-100')
+                          "
+                        >
+                          {{ reading.value }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+
+                  <button
+                    type="button"
+                    class="mt-1 inline-flex h-9 w-full items-center justify-center gap-2 rounded-md border border-white/10 bg-white/[0.03] font-mono text-[10px] text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  >
+                    <ng-icon name="lucideDownload" class="size-3.5" aria-hidden="true" />
+                    {{ telemetry.action }}
+                  </button>
+                </div>
+              </div>
+            } @else if (post.gallery; as gallery) {
+              <div class="grid grid-cols-1 gap-px border-y border-border/60 bg-border/60 sm:grid-cols-2">
+                @for (image of gallery; track image.src) {
+                  <figure class="relative aspect-[5/3] overflow-hidden bg-background">
+                    <img
+                      [ngSrc]="image.src"
+                      fill
+                      [alt]="image.alt"
+                      sizes="(min-width: 1280px) 45vw, 100vw"
+                      class="object-cover"
+                    />
+                    <div
+                      class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"
+                      aria-hidden="true"
+                    ></div>
+                    <figcaption
+                      class="absolute bottom-3 left-3 rounded border border-white/20 bg-black/55 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white/90"
+                    >
+                      {{ image.caption }}
+                    </figcaption>
+                  </figure>
+                }
+              </div>
+            } @else if (post.image; as image) {
+              <figure class="relative aspect-[2/1] w-full overflow-hidden bg-background">
+                <img
+                  [ngSrc]="image.src"
+                  fill
+                  [alt]="image.alt"
+                  sizes="(min-width: 1280px) 90vw, 100vw"
+                  [priority]="post.id === 'coll-agrell'"
+                  class="object-cover"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent"
+                  aria-hidden="true"
+                ></div>
+                <figcaption
+                  class="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded border border-white/20 bg-black/55 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white/90"
+                >
+                  <ng-icon name="lucideMountain" class="size-3" aria-hidden="true" />
+                  {{ image.caption }}
+                </figcaption>
+              </figure>
+            }
+
+            @if (post.gpx; as gpx) {
+              <div
+                class="m-4 flex flex-col gap-3 rounded-md border border-border/60 bg-white/[0.02] p-3 sm:m-5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div class="flex min-w-0 items-center gap-3">
+                  <span
+                    class="flex size-8 shrink-0 items-center justify-center rounded border border-border/60 bg-white/[0.03] text-muted-foreground"
+                  >
+                    <ng-icon name="lucideRoute" class="size-4" aria-hidden="true" />
+                  </span>
+                  <div class="flex min-w-0 flex-col gap-0.5">
+                    <p class="text-xs font-semibold text-foreground">{{ gpx.title }}</p>
+                    <p class="truncate font-mono text-[10px] text-muted-foreground">
+                      {{ gpx.meta }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    class="inline-flex h-8 items-center gap-1.5 rounded border border-border/60 bg-transparent px-3 text-[11px] font-medium text-foreground transition-colors hover:bg-white/[0.04]"
+                  >
+                    <ng-icon name="lucideDownload" class="size-3.5" aria-hidden="true" />
+                    Descargar GPX
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex h-8 items-center gap-1.5 rounded bg-white px-3 text-[11px] font-semibold text-zinc-900 transition-colors hover:bg-zinc-200"
+                  >
+                    <ng-icon name="lucideMap" class="size-3.5" aria-hidden="true" />
+                    Ver en Mapa
+                  </button>
+                </div>
+              </div>
+            }
+
+            <div
+              class="flex items-center justify-between gap-3 border-t border-border/60 px-4 py-3 sm:px-5"
+            >
+              <div class="flex items-center gap-4 text-xs text-muted-foreground">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  [attr.aria-pressed]="isLiked(post.id)"
+                  [attr.aria-label]="'Me gusta la publicación de ' + post.author.name"
+                  (click)="toggleLike(post.id)"
+                >
+                  <ng-icon
+                    name="lucideHeart"
+                    class="size-4"
+                    [class.text-rose-400]="isLiked(post.id)"
+                    aria-hidden="true"
+                  />
+                  <span class="tabular-nums">{{ likeCount(post) }}</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  [attr.aria-label]="'Comentarios de la publicación de ' + post.author.name"
+                >
+                  <ng-icon name="lucideMessageSquare" class="size-4" aria-hidden="true" />
+                  <span class="tabular-nums">{{ post.stats.comments }}</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  [attr.aria-pressed]="isSaved(post.id)"
+                  [attr.aria-label]="'Guardar publicación de ' + post.author.name"
+                  (click)="toggleSaved(post.id)"
+                >
+                  <ng-icon
+                    name="lucideBookmark"
+                    class="size-4"
+                    [class.text-amber-400]="isSaved(post.id)"
+                    aria-hidden="true"
+                  />
+                  <span class="tabular-nums">{{ savedCount(post) }}</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                class="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+              >
+                <ng-icon name="lucideShare2" class="size-4" aria-hidden="true" />
+                Compartir
+              </button>
+            </div>
+          </article>
+        }
+      }
+    </div>
+
+    <aside class="flex min-w-0 flex-col gap-6">
+      <div hlmCard class="gap-0 overflow-hidden py-0">
+        <div class="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
+          <h2 class="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <ng-icon name="lucideMessagesSquare" class="size-4" aria-hidden="true" />
+            Debates en Tendencia
+          </h2>
+          <a href="#" class="text-[10px] text-muted-foreground transition-colors hover:text-foreground">
+            Ver todo (42)
+          </a>
+        </div>
+
+        <div class="divide-y divide-border/60">
+          @for (debate of trendingDebates; track debate.title) {
+            <article class="flex flex-col gap-1.5 px-4 py-3">
+              <div
+                class="flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"
+              >
+                <span>{{ debate.category }}</span>
+                <span>{{ debate.replies }} resp.</span>
+              </div>
+              <h3 class="text-xs font-medium leading-snug text-foreground">
+                {{ debate.title }}
+              </h3>
+              <p class="font-mono text-[9px] text-muted-foreground">
+                Iniciado por {{ debate.author }} · activo {{ debate.active }}
+              </p>
+            </article>
+          }
+        </div>
+
+        <div class="p-3">
+          <button
+            hlmBtn
+            type="button"
+            variant="outline"
+            class="h-9 w-full gap-2 rounded border-border/60 bg-white/[0.02] text-xs font-medium"
+          >
+            <ng-icon name="lucidePlus" class="size-3.5" aria-hidden="true" />
+            Nuevo Hilo de Debate
+          </button>
+        </div>
+      </div>
+
+      <div hlmCard class="gap-0 overflow-hidden py-0">
+        <div class="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
+          <h2 class="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <ng-icon name="lucideCamera" class="size-4" aria-hidden="true" />
+            Capturas de la Semana
+          </h2>
+          <span class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+            Top votadas
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-1.5 p-3">
+          @for (shot of galleryShots; track shot.src) {
+            <figure class="relative aspect-[9/5] overflow-hidden rounded-sm bg-background">
+              <img
+                [ngSrc]="shot.src"
+                fill
+                [alt]="shot.alt"
+                sizes="(min-width: 1280px) 15vw, 50vw"
+                class="object-cover transition-transform duration-500 hover:scale-105"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"
+                aria-hidden="true"
+              ></div>
+              <figcaption
+                class="absolute inset-x-0 bottom-0 p-2 font-mono text-[8px] uppercase tracking-[0.12em] text-white/85"
+              >
+                {{ shot.label }}
+              </figcaption>
+            </figure>
+          }
+        </div>
+
+        <div class="flex items-center justify-between gap-2 border-t border-border/60 px-3 py-2.5">
+          <span class="text-[10px] text-muted-foreground">Curadas por la comunidad</span>
+          <a
+            href="#"
+            class="inline-flex items-center gap-1 text-[10px] font-medium text-foreground transition-colors hover:text-foreground/80"
+          >
+            Explorar Galería Completa
+            <ng-icon name="lucideArrowRight" class="size-3" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+
+      <div hlmCard class="gap-0 overflow-hidden py-0">
+        <div class="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
+          <h2 class="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <ng-icon name="lucideTrophy" class="size-4" aria-hidden="true" />
+            Top Riders Semanal
+          </h2>
+          <span class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+            Semana 42
+          </span>
+        </div>
+
+        <div class="divide-y divide-border/60">
+          @for (rider of topRiders; track rider.handle) {
+            <div class="flex items-center gap-3 px-4 py-2.5">
+              <span class="w-4 font-mono text-[10px] text-muted-foreground">{{ rider.rank }}</span>
+              <span
+                class="flex size-7 shrink-0 items-center justify-center rounded border border-border/60 bg-white/[0.04] font-mono text-[9px] font-semibold text-muted-foreground"
+              >
+                {{ rider.initials }}
+              </span>
+              <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+                <p class="truncate text-xs font-medium text-foreground">{{ rider.handle }}</p>
+                <p class="truncate text-[9px] text-muted-foreground">{{ rider.level }}</p>
+              </div>
+              <div class="shrink-0 text-right">
+                <p class="text-xs font-semibold tabular-nums text-foreground">{{ rider.distance }}</p>
+                <p class="font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">
+                  GPX Validado
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div hlmCard class="p-4">
+        <div class="flex items-start gap-3">
+          <span
+            class="flex size-8 shrink-0 items-center justify-center rounded border border-border/60 bg-white/[0.04] text-muted-foreground"
+          >
+            <ng-icon name="lucideServer" class="size-4" aria-hidden="true" />
+          </span>
+          <div class="flex flex-col gap-1">
+            <h2 class="text-xs font-semibold text-foreground">Servidor Telemetry GPX</h2>
+            <p class="text-[10px] leading-relaxed text-muted-foreground">
+              Compresión zstd v1.5 activa. Sincronización continua con sensores Bosch IMU 6-DOF y
+              registradores Garmin.
+            </p>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center gap-4 font-mono text-[9px] text-muted-foreground">
+          <span class="flex items-center gap-1.5">
+            <span class="size-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
+            Uptime 99.98%
+          </span>
+          <span>Latencia: 18ms</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="border-t border-border/60">
+    <div
+      class="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:px-8"
+    >
+      <p>© 2025 ApexRoute Architecture. Distribuido para pilotos y exploradores.</p>
+      <nav class="flex flex-wrap items-center gap-x-6 gap-y-2" aria-label="Enlaces del pie de página">
+        <a href="#" class="transition-colors hover:text-foreground">Telemetría</a>
+        <a href="#" class="transition-colors hover:text-foreground">API Protocol</a>
+        <a href="#" class="transition-colors hover:text-foreground">Estado del Sistema</a>
+        <a href="#" class="transition-colors hover:text-foreground">Privacidad</a>
+      </nav>
+    </div>
+  </footer>
+</section>
