@@ -4,29 +4,28 @@ import {
   lucideArrowRight,
   lucideBookmark,
   lucideCar,
+  lucideCheck,
   lucideCloudSun,
   lucideDownload,
-  lucideEraser,
+  lucideHistory,
   lucideLayers,
   lucideMap,
-  lucideMapPin,
   lucideMinus,
-  lucideMountainSnow,
   lucidePlus,
   lucideRefreshCw,
   lucideRotateCcw,
+  lucideRoute,
   lucideSignpost,
+  lucideSlidersHorizontal,
   lucideSparkles,
+  lucideTrendingUp,
   lucideZap,
 } from '@ng-icons/lucide';
-import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmChartImports } from '@spartan-ng/helm/chart';
-import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
 import { HlmSliderImports } from '@spartan-ng/helm/slider';
 import { HlmSwitchImports } from '@spartan-ng/helm/switch';
-import { HlmTabsImports } from '@spartan-ng/helm/tabs';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { areaY, defineChart, dot, lineY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
@@ -41,14 +40,11 @@ interface ElevationPoint {
   selector: 'app-routes',
   imports: [
     NgIcon,
-    HlmBadgeImports,
     HlmButtonImports,
     HlmCardImports,
     HlmChartImports,
-    HlmSeparatorImports,
     HlmSliderImports,
     HlmSwitchImports,
-    HlmTabsImports,
     HlmTextareaImports,
   ],
   templateUrl: './routes.html',
@@ -58,29 +54,39 @@ interface ElevationPoint {
       lucideArrowRight,
       lucideBookmark,
       lucideCar,
+      lucideCheck,
       lucideCloudSun,
       lucideDownload,
-      lucideEraser,
+      lucideHistory,
       lucideLayers,
       lucideMap,
-      lucideMapPin,
       lucideMinus,
-      lucideMountainSnow,
-      lucidePlus,
+          lucidePlus,
       lucideRefreshCw,
       lucideRotateCcw,
+      lucideRoute,
       lucideSignpost,
+      lucideSlidersHorizontal,
       lucideSparkles,
+      lucideTrendingUp,
       lucideZap,
     }),
   ],
 })
 export class Routes {
   private readonly initialDescription =
-    'Ruta revirada por la Sierra de Guadarrama, asfalto impecable, puertos con desnivel técnico y parada en un asador panorámico. Evitar tramos urbanos y autovías. Máximo 220 km. Ideal para deportivas.';
+    'Ruta revirada por la Sierra de Guadarrama, asfalto impecable, puertos con desnivel técnico y parada en mirador panorámico. Evitar tramos urbanos y autovías. Máximo 220 km.';
 
   protected readonly description = signal(this.initialDescription);
   protected readonly descriptionLength = computed(() => this.description().length);
+
+  protected readonly tabs = [
+    { id: 'assisted', label: 'Trazada Asistida por IA', icon: 'lucideRoute', count: null },
+    { id: 'presets', label: 'Presets de Carrera', icon: 'lucideSlidersHorizontal', count: null },
+    { id: 'elevation', label: 'Cálculo Altimétrico & Grip', icon: 'lucideTrendingUp', count: null },
+    { id: 'history', label: 'Historial de Generaciones', icon: 'lucideHistory', count: 14 },
+  ] as const;
+  protected readonly activeTab = signal<string>('assisted');
 
   protected readonly presets = [
     'Curvas Técnicas',
@@ -99,7 +105,7 @@ export class Routes {
   protected readonly mapZoom = signal(1);
   protected readonly mapTransform = computed(
     () =>
-      `translate(500 300) scale(${this.mapZoom()}) translate(-500 -300)`,
+      `translate(500 350) scale(${this.mapZoom()}) translate(-500 -350)`,
   );
   protected readonly showRelief = signal(true);
   protected readonly activeWaypoint = signal(0);
@@ -137,22 +143,30 @@ export class Routes {
           x: 'km',
           y: 'elevation',
           y1: 1000,
-          fill: '#f59e0b',
-          fillOpacity: 0.16,
+          fill: '#fafafa',
+          fillOpacity: 0.08,
         }),
         lineY(this.elevationData, {
           x: 'km',
           y: 'elevation',
-          stroke: '#f59e0b',
+          stroke: '#fafafa',
+          strokeWidth: 2,
+        }),
+        dot([{ km: 55, elevation: 1858 }], {
+          x: 'km',
+          y: 'elevation',
+          r: 4,
+          fill: '#34d399',
+          stroke: '#065f46',
           strokeWidth: 2,
         }),
         dot([this.peak], {
           x: 'km',
           y: 'elevation',
-          r: 4,
-          fill: '#22d3ee',
-          stroke: '#0e7490',
-          strokeWidth: 2,
+          r: 3,
+          fill: '#fafafa',
+          stroke: '#a1a1aa',
+          strokeWidth: 1.5,
         }),
       ],
       scales: {
@@ -194,12 +208,12 @@ export class Routes {
         muted: 'var(--muted-foreground)',
         grid: 'var(--border)',
         background: 'transparent',
-        palette: ['#f59e0b', '#22d3ee'],
+        palette: ['#fafafa', '#34d399'],
       },
       svgAnimation: false,
       tooltip,
     }),
-    height: 200,
+    height: 180,
     ariaLabel: 'Perfil altimétrico de la ruta Trans-Sierra Curves Express',
   };
 
@@ -208,8 +222,8 @@ export class Routes {
     this.description.set(target.value.slice(0, 400));
   }
 
-  protected clearDescription(): void {
-    this.description.set('');
+  protected selectTab(tabId: string): void {
+    this.activeTab.set(tabId);
   }
 
   protected selectPreset(preset: string): void {
@@ -242,6 +256,7 @@ export class Routes {
 
   protected reset(): void {
     this.description.set(this.initialDescription);
+    this.activeTab.set('assisted');
     this.selectedPreset.set(this.presets[0]);
     this.curveDensity.set(88);
     this.estimatedDistance.set(218);
