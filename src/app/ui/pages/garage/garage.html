@@ -1,1 +1,914 @@
-<p>garage works!</p>,
+<section class="flex w-full flex-col">
+  <div class="mx-auto flex w-full max-w-[1600px] flex-col px-4 sm:px-6 xl:px-8">
+    <div
+      class="flex flex-col gap-3 border-b border-border/60 py-3 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <nav
+        aria-label="Migas de pan"
+        class="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
+      >
+        <a routerLink="/home" class="transition-colors hover:text-foreground">ApexRoute</a>
+        <span aria-hidden="true">/</span>
+        <span>Telemetría Central</span>
+        <span aria-hidden="true">/</span>
+        <span class="text-foreground">Mi Garaje Virtual</span>
+      </nav>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          class="inline-flex items-center gap-2 rounded border border-border/60 bg-white/[0.03] px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"
+        >
+          <span class="size-1.5 rounded-full bg-white" aria-hidden="true"></span>
+          {{ bikes.length }} monturas registradas
+        </span>
+        <span
+          class="inline-flex items-center gap-2 rounded border border-border/60 bg-white/[0.03] px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"
+        >
+          <ng-icon name="lucideRadio" class="size-3" aria-hidden="true" />
+          ECU Sync: Activa
+        </span>
+        <span
+          class="inline-flex items-center gap-2 rounded border border-border/60 bg-white/[0.03] px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"
+        >
+          <ng-icon name="lucideWifi" class="size-3" aria-hidden="true" />
+          Ping 18ms
+        </span>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-6 pt-8 lg:flex-row lg:items-end lg:justify-between">
+      <div class="flex flex-col gap-3">
+        <span
+          class="inline-flex w-fit items-center rounded border border-border/60 bg-white/[0.03] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+        >
+          SYS://GARAGE_MODULE.64
+        </span>
+        <h1 class="text-4xl font-bold tracking-tight text-foreground sm:text-5xl xl:text-6xl">
+          Mi Garaje Virtual
+        </h1>
+        <p class="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          Gestión de monturas de alta cilindrada, historial mecánico, telemetría y actividad de
+          rodaje en red sincronizada.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          class="inline-flex h-11 items-center gap-2 rounded-md border border-border/60 bg-white/[0.03] px-4 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        >
+          <ng-icon name="lucideSlidersHorizontal" class="size-4" aria-hidden="true" />
+          Filtros Logs
+        </button>
+        <button
+          type="button"
+          class="inline-flex h-11 items-center gap-2 rounded-md bg-white px-4 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+          (click)="openRegister()"
+        >
+          <ng-icon name="lucidePlus" class="size-4" aria-hidden="true" />
+          Registrar Nueva Moto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8 border-y border-border/60 bg-white/[0.02]">
+    <div class="mx-auto w-full max-w-[1600px] px-4 sm:px-6 xl:px-8">
+      <nav
+        aria-label="Secciones del garaje"
+        class="-mx-2 flex items-center gap-1 overflow-x-auto px-2 py-2"
+      >
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            [attr.aria-current]="selectedTab() === tab.id ? 'page' : null"
+            [class]="
+              selectedTab() === tab.id
+                ? 'inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-border/70 bg-white/[0.06] px-3 text-sm font-medium text-foreground'
+                : 'inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-transparent px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground'
+            "
+            (click)="selectTab(tab)"
+          >
+            <ng-icon [name]="tab.icon" class="size-4" aria-hidden="true" />
+            {{ tab.label }}
+            @if (tab.count) {
+              <span
+                class="rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-muted-foreground"
+              >
+                {{ tab.count }}
+              </span>
+            }
+          </button>
+        }
+      </nav>
+    </div>
+  </div>
+
+  <div
+    class="mx-auto grid w-full max-w-[1600px] grid-cols-1 gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1.95fr)_minmax(0,1fr)] xl:items-start xl:px-8"
+  >
+    <div class="flex min-w-0 flex-col gap-8">
+      <article
+        id="garage-bikes"
+        class="scroll-mt-24 overflow-hidden rounded-lg border border-border/60 bg-card"
+      >
+        <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
+          <div class="flex flex-col gap-1">
+            <p
+              class="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground"
+            >
+              <span class="size-1.5 rounded-full bg-white" aria-hidden="true"></span>
+              Montura activa principal
+            </p>
+            <h2 class="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+              {{ activeBike().name }}
+            </h2>
+          </div>
+
+          <div
+            class="inline-flex w-fit rounded-md border border-border/60 bg-white/[0.02] p-0.5"
+            role="group"
+            aria-label="Cambiar montura activa"
+          >
+            @for (bike of bikes; track bike.id) {
+              <button
+                type="button"
+                [attr.aria-pressed]="activeBike().id === bike.id"
+                [class]="
+                  activeBike().id === bike.id
+                    ? 'rounded border border-border/80 bg-white/[0.07] px-3 py-1.5 text-xs font-medium text-foreground'
+                    : 'rounded border border-transparent px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground'
+                "
+                (click)="selectBike(bike.id)"
+              >
+                {{ bike.model }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="relative min-h-72 sm:min-h-[360px]">
+          <img
+            [ngSrc]="activeBike().image"
+            fill
+            [priority]="true"
+            [alt]="activeBike().imageAlt"
+            sizes="(min-width: 1280px) 62vw, 100vw"
+            class="object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/60"
+            aria-hidden="true"
+          ></div>
+
+          <div
+            class="absolute inset-x-0 top-0 flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between"
+          >
+            <div class="flex flex-col gap-2">
+              <span
+                class="inline-flex w-fit items-center gap-1.5 rounded border border-white/15 bg-black/55 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-white backdrop-blur"
+              >
+                <span class="size-1.5 rounded-full bg-white" aria-hidden="true"></span>
+                {{ activeBike().map }}
+              </span>
+              <span class="font-mono text-[9px] uppercase tracking-[0.14em] text-white/60">
+                VIN · {{ activeBike().vin }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="inline-flex w-fit items-center gap-1.5 rounded border border-white/15 bg-black/55 px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            >
+              <ng-icon name="lucideCamera" class="size-3.5" aria-hidden="true" />
+              Actualizar Portada
+            </button>
+          </div>
+
+          <div
+            class="absolute inset-x-0 bottom-0 flex flex-col gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5"
+          >
+            <div class="flex flex-wrap items-end gap-6">
+              <div class="flex flex-col gap-1">
+                <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-white/60">
+                  Kilómetros totales
+                </p>
+                <p class="flex items-baseline gap-1.5 text-white">
+                  <span class="text-2xl font-semibold tabular-nums tracking-tight">{{
+                    activeBike().odometer
+                  }}</span>
+                  <span class="text-[11px] text-white/70">km</span>
+                </p>
+              </div>
+              <div class="flex flex-col gap-1">
+                <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-white/60">
+                  Próxima revisión desmo
+                </p>
+                <p class="flex items-baseline gap-1.5 text-white">
+                  <span class="text-2xl font-semibold tabular-nums tracking-tight">{{
+                    activeBike().nextService
+                  }}</span>
+                  <span class="text-[11px] text-white/70">km restantes</span>
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="inline-flex w-fit items-center gap-2 text-xs font-medium text-white transition-colors hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            >
+              <ng-icon name="lucideSlidersHorizontal" class="size-4" aria-hidden="true" />
+              Editar Ficha / Modificaciones
+            </button>
+          </div>
+        </div>
+
+        <div class="border-t border-border/60 p-4 sm:p-5">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h3 class="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ng-icon name="lucideCamera" class="size-4" aria-hidden="true" />
+              Galería Técnica &amp; Vistas Detalladas
+            </h3>
+            <span class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+              4 fotografías sincronizadas
+            </span>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            @for (shot of gallery; track shot.src) {
+              <figure class="relative aspect-[16/10] overflow-hidden rounded-sm bg-black">
+                <img
+                  [ngSrc]="shot.src"
+                  fill
+                  [alt]="shot.alt"
+                  sizes="(min-width: 1280px) 12vw, (min-width: 640px) 25vw, 50vw"
+                  class="object-cover"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"
+                  aria-hidden="true"
+                ></div>
+                <figcaption
+                  class="absolute inset-x-0 bottom-0 p-2 font-mono text-[8px] uppercase tracking-[0.12em] text-white/85"
+                >
+                  {{ shot.label }}
+                </figcaption>
+              </figure>
+            }
+
+            <button
+              type="button"
+              class="flex aspect-[16/10] flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-border/70 bg-white/[0.02] text-muted-foreground transition-colors hover:border-border hover:bg-white/[0.05] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+            >
+              <ng-icon name="lucideCloudUpload" class="size-4" aria-hidden="true" />
+              <span class="text-[10px] font-medium">+ Añadir foto</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-px border-t border-border/60 bg-border/60 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="flex flex-col gap-2 bg-card p-4">
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+                Neumáticos
+              </p>
+              <ng-icon name="lucideCircleDot" class="size-3.5 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <p class="text-sm font-semibold leading-tight text-foreground">Michelin Anakee Wild</p>
+            <div class="mt-auto flex flex-col gap-1.5">
+              <div class="flex items-center justify-between font-mono text-[9px] text-muted-foreground">
+                <span>Vida útil estimada</span>
+                <span class="text-foreground">75%</span>
+              </div>
+              <div class="h-1 w-full overflow-hidden rounded-full bg-white/10">
+                <div class="h-full w-3/4 rounded-full bg-white"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2 bg-card p-4">
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+                Presión sensores<br />TPMS
+              </p>
+              <ng-icon name="lucideGauge" class="size-3.5 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <p class="mt-auto flex items-baseline gap-1.5 text-foreground">
+              <span class="text-xl font-semibold tabular-nums tracking-tight">2.3 / 2.5</span>
+              <span class="font-mono text-[10px] text-muted-foreground">BAR</span>
+            </p>
+            <p class="font-mono text-[9px] text-muted-foreground">
+              <span class="mr-1 text-emerald-400" aria-hidden="true">●</span>
+              Calibración en frío OK
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-2 bg-card p-4">
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+                Consumo ECU
+              </p>
+              <ng-icon name="lucideFuel" class="size-3.5 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <p class="mt-auto flex items-baseline gap-1.5 text-foreground">
+              <span class="text-xl font-semibold tabular-nums tracking-tight">5.4</span>
+              <span class="font-mono text-[10px] text-muted-foreground">L/100km</span>
+            </p>
+            <p class="font-mono text-[9px] text-muted-foreground">Autonomía est. ~388 km</p>
+          </div>
+
+          <div class="flex flex-col gap-2 bg-card p-4">
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+                Batería &amp;<br />Alternador
+              </p>
+              <ng-icon
+                name="lucideBatteryCharging"
+                class="size-3.5 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </div>
+            <p class="mt-auto flex items-baseline gap-1.5 text-foreground">
+              <span class="text-xl font-semibold tabular-nums tracking-tight">14.2</span>
+              <span class="font-mono text-[10px] text-muted-foreground">V</span>
+            </p>
+            <p class="font-mono text-[9px] text-muted-foreground">Óptimo (Cargando en marcha)</p>
+          </div>
+        </div>
+      </article>
+
+      <section
+        id="garage-created"
+        aria-labelledby="garage-created-title"
+        class="scroll-mt-24 flex flex-col gap-4"
+      >
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div class="flex flex-col gap-1">
+            <h2 id="garage-created-title" class="text-xl font-semibold tracking-tight text-foreground">
+              Rutas Creadas por Ti
+            </h2>
+            <p class="text-xs leading-relaxed text-muted-foreground">
+              Trazados cartografiados por telemetría GPS y compartidos con la comunidad ApexRoute.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="inline-flex h-9 w-fit items-center gap-2 rounded-md border border-border/60 bg-white/[0.03] px-3 text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          >
+            <ng-icon name="lucideArrowRight" class="size-3.5" aria-hidden="true" />
+            Gestionar Públicas (14)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          @for (route of createdRoutes; track route.id) {
+            <article class="flex flex-col gap-3 rounded-lg border border-border/60 bg-card p-4">
+              <div class="flex items-start justify-between gap-3">
+                <span
+                  class="rounded border border-border/60 bg-white/[0.03] px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground"
+                >
+                  {{ route.tag }}
+                </span>
+                <button
+                  type="button"
+                  class="flex size-8 shrink-0 items-center justify-center rounded border border-border/60 bg-white/[0.03] text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  [attr.aria-label]="'Descargar GPX de ' + route.title"
+                >
+                  <ng-icon name="lucideDownload" class="size-3.5" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <h3 class="text-lg font-semibold tracking-tight text-foreground">
+                  {{ route.title }}
+                </h3>
+                <p class="text-xs leading-relaxed text-muted-foreground">{{ route.description }}</p>
+              </div>
+
+              <div class="rounded border border-border/50 bg-black/20 px-3 py-2">
+                <svg
+                  viewBox="0 0 400 80"
+                  preserveAspectRatio="none"
+                  class="h-16 w-full text-zinc-100"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M0 74 H400"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                    class="text-border"
+                    opacity="0.6"
+                  />
+                  <path
+                    [attr.d]="route.graphPath"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <div
+                  class="flex items-center justify-between font-mono text-[9px] text-muted-foreground"
+                >
+                  <span>{{ route.elevationStart }}</span>
+                  <span>Max: {{ route.elevationMax }}</span>
+                  <span>{{ route.elevationEnd }}</span>
+                </div>
+              </div>
+
+              <div
+                class="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 font-mono text-[10px] text-muted-foreground"
+              >
+                <div class="flex flex-wrap items-center gap-4">
+                  <span class="inline-flex items-center gap-1.5">
+                    <ng-icon name="lucideBike" class="size-3.5" aria-hidden="true" />
+                    {{ route.distance }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <ng-icon name="lucideClock" class="size-3.5" aria-hidden="true" />
+                    {{ route.duration }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <ng-icon name="lucideHeart" class="size-3.5" aria-hidden="true" />
+                    {{ route.likes }}
+                  </span>
+                </div>
+                <span class="uppercase tracking-[0.12em]">GPX v1.1 OK</span>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section
+        id="garage-saved"
+        aria-labelledby="garage-saved-title"
+        class="scroll-mt-24 flex flex-col gap-4"
+      >
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div class="flex flex-col gap-1">
+            <h2 id="garage-saved-title" class="text-xl font-semibold tracking-tight text-foreground">
+              Rutas Guardadas &amp; Siguiendo (38)
+            </h2>
+            <p class="text-xs leading-relaxed text-muted-foreground">
+              Itinerarios verificados por la comunidad listos para sincronizar a tu GPS o tablero.
+            </p>
+          </div>
+          <a
+            href="#"
+            class="inline-flex w-fit items-center gap-1 text-xs font-medium text-foreground transition-colors hover:text-foreground/80"
+          >
+            Ver todas (38)
+            <ng-icon name="lucideArrowRight" class="size-3.5" aria-hidden="true" />
+          </a>
+        </div>
+
+        <article
+          class="grid grid-cols-1 overflow-hidden rounded-lg border border-border/60 bg-card md:grid-cols-[minmax(0,280px)_minmax(0,1fr)]"
+        >
+          <figure class="relative min-h-56 overflow-hidden bg-black md:min-h-full">
+            <img
+              [ngSrc]="savedRoute.image"
+              fill
+              [alt]="savedRoute.imageAlt"
+              sizes="(min-width: 1280px) 20vw, 100vw"
+              class="object-cover"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"
+              aria-hidden="true"
+            ></div>
+            <figcaption
+              class="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded border border-white/20 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-white backdrop-blur"
+            >
+              <ng-icon name="lucideMountain" class="size-3" aria-hidden="true" />
+              {{ savedRoute.badge }}
+            </figcaption>
+          </figure>
+
+          <div class="flex flex-col gap-3 p-4 sm:p-5">
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"
+            >
+              <span>Creada por {{ savedRoute.author }}</span>
+              <span class="text-foreground">Dificultad: {{ savedRoute.difficulty }}</span>
+            </div>
+
+            <h3 class="text-xl font-semibold tracking-tight text-foreground">
+              {{ savedRoute.title }}
+            </h3>
+            <p class="max-w-2xl text-xs leading-relaxed text-muted-foreground">
+              {{ savedRoute.description }}
+            </p>
+
+            <p
+              class="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] text-muted-foreground"
+            >
+              <span class="text-foreground">{{ savedRoute.distance }}</span>
+              <span aria-hidden="true">·</span>
+              <span>{{ savedRoute.duration }}</span>
+              <span aria-hidden="true">·</span>
+              <span class="text-foreground">{{ savedRoute.elevation }}</span>
+            </p>
+
+            <div class="mt-1 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                class="inline-flex h-9 items-center gap-2 rounded-md bg-white px-4 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                (click)="toggleSync()"
+              >
+                {{ syncEnabled() ? 'Sincronizado en TFT' : 'Sincronizar a TFT' }}
+              </button>
+              <button
+                type="button"
+                class="flex size-9 items-center justify-center rounded-md border border-border/60 bg-white/[0.03] text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                aria-label="Descargar archivo GPX"
+              >
+                <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section
+        id="garage-events"
+        aria-labelledby="garage-events-title"
+        class="scroll-mt-24 flex flex-col gap-4"
+      >
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div class="flex flex-col gap-1">
+            <h2 id="garage-events-title" class="text-xl font-semibold tracking-tight text-foreground">
+              Próximos Eventos &amp; Kedadas
+            </h2>
+            <p class="text-xs leading-relaxed text-muted-foreground">
+              Convocatorias oficiales y salidas grupales sincronizadas con tu calendario.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="inline-flex h-9 w-fit items-center gap-2 rounded-md border border-border/60 bg-white/[0.03] px-3 text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          >
+            Explorar Kedadas
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          @for (event of events; track event.title) {
+            <article class="flex flex-col gap-3 rounded-lg border border-border/60 bg-card p-4">
+              <div class="flex items-start gap-3">
+                <div
+                  class="flex size-14 shrink-0 flex-col items-center justify-center rounded-md border border-border/60 bg-white/[0.04]"
+                >
+                  <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+                    {{ event.month }}
+                  </span>
+                  <span class="text-2xl font-bold leading-none text-foreground">{{ event.day }}</span>
+                </div>
+
+                <div class="flex min-w-0 flex-col gap-1">
+                  <span
+                    class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground"
+                  >
+                    {{ event.type }}
+                  </span>
+                  <h3 class="text-sm font-semibold leading-snug text-foreground">
+                    {{ event.title }}
+                  </h3>
+                  <p class="text-[11px] leading-relaxed text-muted-foreground">
+                    Punto: {{ event.location }} · {{ event.time }}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3"
+              >
+                <div class="flex items-center" aria-label="Riders asistentes">
+                  @for (rider of event.riders; track rider) {
+                    <span
+                      class="-ml-1 flex size-6 items-center justify-center rounded-full border border-card bg-white/[0.08] font-mono text-[8px] font-semibold text-muted-foreground first:ml-0"
+                    >
+                      {{ rider }}
+                    </span>
+                  }
+                  <span
+                    class="ml-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground"
+                  >
+                    +{{ event.extra }}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  class="inline-flex h-8 items-center gap-1.5 rounded border border-border/60 bg-white/[0.03] px-2.5 text-[10px] font-medium text-foreground transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                >
+                  <ng-icon name="lucideMap" class="size-3.5" aria-hidden="true" />
+                  Ver Convocatoria / GPX
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    </div>
+
+    <aside class="flex min-w-0 flex-col gap-6">
+      @if (registerOpen()) {
+        <div class="overflow-hidden rounded-lg border border-border/60 bg-card">
+          <div class="flex items-start justify-between gap-3 border-b border-border/60 p-4">
+            <div class="flex flex-col gap-1">
+              <p
+                class="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground"
+              >
+                <span class="size-1.5 rounded-full bg-white" aria-hidden="true"></span>
+                Módulo Alta V2.4
+              </p>
+              <h2 class="mt-1 text-xl font-semibold tracking-tight text-foreground">
+                Registrar Nueva Moto
+              </h2>
+              <p class="text-xs leading-relaxed text-muted-foreground">
+                Añade una montura a tu flota para vincular telemetría OBD y consumo de rutas.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="flex size-7 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+              aria-label="Cerrar formulario de alta"
+              (click)="closeRegister()"
+            >
+              <ng-icon name="lucideX" class="size-4" aria-hidden="true" />
+            </button>
+          </div>
+
+          <form
+            [formGroup]="registerForm"
+            (ngSubmit)="registerBike()"
+            class="flex flex-col gap-5 p-4"
+          >
+            <fieldset class="flex flex-col gap-3">
+              <legend
+                class="flex w-full items-center justify-between font-mono text-[9px] uppercase tracking-[0.14em] text-foreground"
+              >
+                <span>01 // Datos Básicos</span>
+                <span class="text-[8px] text-muted-foreground">Obligatorio</span>
+              </legend>
+
+              <div class="flex flex-col gap-1.5">
+                <label for="garage-model" class="text-[11px] font-medium text-muted-foreground">
+                  Marca y Modelo Completo
+                </label>
+                <input
+                  id="garage-model"
+                  type="text"
+                  formControlName="model"
+                  placeholder="Ej: Husqvarna Norden 901 Expedition"
+                  class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1.5">
+                  <label for="garage-year" class="text-[11px] font-medium text-muted-foreground">
+                    Año Fab.
+                  </label>
+                  <input
+                    id="garage-year"
+                    type="text"
+                    inputmode="numeric"
+                    formControlName="year"
+                    class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label for="garage-plate" class="text-[11px] font-medium text-muted-foreground">
+                    Matrícula o VIN
+                  </label>
+                  <input
+                    id="garage-plate"
+                    type="text"
+                    formControlName="plate"
+                    class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label
+                    for="garage-displacement"
+                    class="text-[11px] font-medium text-muted-foreground"
+                  >
+                    Cilindrada (cc)
+                  </label>
+                  <input
+                    id="garage-displacement"
+                    type="text"
+                    formControlName="displacement"
+                    class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label for="garage-power" class="text-[11px] font-medium text-muted-foreground">
+                    Potencia (CV)
+                  </label>
+                  <input
+                    id="garage-power"
+                    type="text"
+                    formControlName="power"
+                    class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                  />
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="flex flex-col gap-3">
+              <legend
+                class="w-full font-mono text-[9px] uppercase tracking-[0.14em] text-foreground"
+              >
+                02 // Categoría &amp; Configuración
+              </legend>
+
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[11px] font-medium text-muted-foreground">
+                  Tipología de Conducción
+                </span>
+                <div class="grid grid-cols-2 gap-2" role="group" aria-label="Tipología de conducción">
+                  @for (category of categories; track category.id) {
+                    <button
+                      type="button"
+                      [attr.aria-pressed]="registerForm.controls.category.value === category.id"
+                      [class]="
+                        registerForm.controls.category.value === category.id
+                          ? 'flex h-10 items-center justify-between gap-2 rounded border border-border/80 bg-white/[0.07] px-3 text-left text-[11px] font-medium text-foreground'
+                          : 'flex h-10 items-center justify-between gap-2 rounded border border-transparent bg-white/[0.03] px-3 text-left text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground'
+                      "
+                      (click)="setCategory(category.id)"
+                    >
+                      <span>{{ category.label }}</span>
+                      @if (registerForm.controls.category.value === category.id) {
+                        <ng-icon name="lucideCheck" class="size-3.5" aria-hidden="true" />
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <fieldset class="flex flex-col gap-1.5">
+                <legend class="text-[11px] font-medium text-muted-foreground">
+                  Estado de Limitación Carnet
+                </legend>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  @for (license of licenses; track license.id) {
+                    <label
+                      class="flex cursor-pointer items-center gap-2 text-[11px] text-muted-foreground"
+                    >
+                      <input
+                        type="radio"
+                        formControlName="license"
+                        [value]="license.id"
+                        class="size-3.5 accent-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                      />
+                      {{ license.label }}
+                    </label>
+                  }
+                </div>
+              </fieldset>
+            </fieldset>
+
+            <fieldset class="flex flex-col gap-3">
+              <legend
+                class="w-full font-mono text-[9px] uppercase tracking-[0.14em] text-foreground"
+              >
+                03 // Fotografía &amp; Sensores
+              </legend>
+
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[11px] font-medium text-muted-foreground">
+                  Fotografía Principal de Portada
+                </span>
+                <label
+                  for="garage-photo"
+                  class="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded border border-dashed border-border/70 bg-black/25 px-4 py-5 text-center transition-colors hover:border-border hover:bg-white/[0.02] focus-within:ring-2 focus-within:ring-ring/40"
+                >
+                  <ng-icon
+                    name="lucideCloudUpload"
+                    class="size-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <span class="text-[11px] font-medium text-foreground">
+                    Arrastra o selecciona imagen JPG/RAW
+                  </span>
+                  <span class="font-mono text-[9px] text-muted-foreground">
+                    Resolución recomendada: 1920x1080px (máx 15MB)
+                  </span>
+                  <input id="garage-photo" type="file" accept="image/*" class="sr-only" />
+                </label>
+              </div>
+
+              <label
+                class="flex cursor-pointer items-start gap-3 rounded border border-border/60 bg-white/[0.03] p-3"
+              >
+                <input
+                  type="checkbox"
+                  formControlName="obd"
+                  class="mt-0.5 size-4 shrink-0 accent-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
+                <span class="flex flex-col gap-1">
+                  <span class="text-xs font-semibold text-foreground">
+                    Vincular con OBD-II / Garmin Connect
+                  </span>
+                  <span class="text-[10px] leading-relaxed text-muted-foreground">
+                    Sincroniza presiones de neumáticos, temperatura del refrigerante y consumo por
+                    ruta en tiempo real.
+                  </span>
+                </span>
+              </label>
+            </fieldset>
+
+            <div class="flex gap-2">
+              <button
+                type="submit"
+                class="inline-flex h-11 flex-1 items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              >
+                Registrar en Garaje
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-11 flex-1 items-center justify-center rounded-md bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                (click)="closeRegister()"
+              >
+                Cancelar
+              </button>
+            </div>
+
+            <p
+              class="flex items-center justify-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.08em] text-muted-foreground"
+            >
+              <ng-icon name="lucideShieldCheck" class="size-3" aria-hidden="true" />
+              Seguridad cifrada TLS 1.3 · Telemetría compatible Euro 5 / 5+
+            </p>
+          </form>
+        </div>
+      }
+
+      <div class="rounded-lg border border-border/60 bg-card p-4">
+        <div class="flex items-center justify-between gap-2">
+          <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+            Montura secundaria · En garaje
+          </p>
+          <span
+            class="rounded border border-border/60 bg-white/[0.04] px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-muted-foreground"
+          >
+            Standby
+          </span>
+        </div>
+
+        <div class="mt-3 flex items-center gap-3">
+          <figure class="relative size-16 shrink-0 overflow-hidden rounded border border-border/60 bg-black">
+            <img
+              [ngSrc]="secondaryBike().image"
+              fill
+              [alt]="secondaryBike().imageAlt"
+              sizes="64px"
+              class="object-cover"
+            />
+          </figure>
+          <div class="flex min-w-0 flex-col gap-0.5">
+            <p class="truncate text-sm font-semibold text-foreground">{{ secondaryBike().name }}</p>
+            <p class="font-mono text-[10px] text-muted-foreground">
+              {{ secondaryBike().displacement }} · {{ secondaryBike().power }} ·
+              {{ secondaryBike().year }}
+            </p>
+            <p class="font-mono text-[10px] text-muted-foreground">
+              <span class="text-foreground">{{ secondaryBike().odometer }} km</span> acumulados
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-border/60 bg-white/[0.03] text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          (click)="setPrimaryBike(secondaryBike().id)"
+        >
+          <ng-icon name="lucideArrowRightLeft" class="size-3.5" aria-hidden="true" />
+          Activar como Montura Principal
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="garage-maintenance" class="scroll-mt-24 border-t border-border/60">
+    <div
+      class="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 xl:px-8"
+    >
+      <p>© 2025 ApexRoute Architecture. Distribuido para pilotos y exploradores.</p>
+      <nav class="flex flex-wrap items-center gap-x-6 gap-y-2" aria-label="Enlaces del pie de página">
+        <a href="#" class="transition-colors hover:text-foreground">Telemetría</a>
+        <a href="#" class="transition-colors hover:text-foreground">API Protocol</a>
+        <a href="#" class="transition-colors hover:text-foreground">Estado del Sistema</a>
+        <a href="#" class="transition-colors hover:text-foreground">Privacidad</a>
+      </nav>
+    </div>
+  </footer>
+</section>
