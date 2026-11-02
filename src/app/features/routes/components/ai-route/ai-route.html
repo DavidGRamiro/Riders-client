@@ -1,0 +1,167 @@
+<div class="flex min-w-0 flex-col gap-6">
+  <div hlmCard class="gap-0 overflow-hidden bg-white/[0.02]! py-0">
+    
+    <form [formRoot]="aiRouteForm">
+      <!-- 01/ Origen -->
+      <section class="flex flex-col gap-5 p-5 sm:p-6">
+        <div class="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
+          <h2 class="font-mono text-sm font-semibold tracking-[0.12em] text-foreground">
+            01 <span class="text-muted-foreground">//</span> ORIGEN Y DESTINO
+          </h2>
+          <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Prompt IA
+          </span>
+        </div>
+  
+        <!-- Addittional user data (PROMPT) -->
+        <div class="flex flex-col gap-2">
+          <label for="route-description" class="text-sm font-medium text-foreground">
+            Descripción y Requisitos
+          </label>
+          <textarea id="route-description" hlmTextarea rows="4" [formField]="aiRouteForm.additional_message"
+            class="min-h-24 resize-none border-border/60 bg-white/[0.02] text-sm leading-relaxed"></textarea>
+        </div>
+  
+        <div class="flex flex-wrap items-center justify-end gap-2 font-mono text-[11px] text-muted-foreground">
+          <span class="tabular-nums">{{ aiRouteForm.additional_message.length || 0 }} / 400</span>
+        </div>
+  
+        <!-- Type of route -->
+        <div class="flex flex-col gap-3">
+          <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Presets de modo
+          </p>
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            @for (preset of presets; track preset) {
+            <button type="button" [attr.aria-pressed]="selectedPreset() === preset" [class]="
+                      selectedPreset() === preset
+                        ? 'flex items-center justify-between gap-3 rounded-md border border-border bg-white/[0.06] px-3.5 py-2 text-left text-sm font-medium text-foreground'
+                        : 'flex items-center justify-between gap-3 rounded-md border border-border/60 bg-white/[0.02] px-3.5 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground'
+                    " (click)="selectPreset(preset)">
+              {{ preset }}
+              @if (selectedPreset() === preset) {
+              <ng-icon name="lucideCheck" class="size-4 text-emerald-400" aria-hidden="true" />
+              }
+            </button>
+            }
+          </div>
+        </div>
+  
+        <div class="flex gap-2">
+          <hlm-field class="gap-1">
+            <label hlmFieldLabel for="input-field-origen">Origen</label>
+            <input hlmInput id="input-field-origen" type="text" placeholder="Punto de origen de la ruta" [formField]="aiRouteForm.origin"/>
+          </hlm-field>
+          <hlm-field class="gap-1">
+            <label hlmFieldLabel for="input-field-destino">Destino</label>
+            <input hlmInput id="input-field-destino" type="text" placeholder="Destino final" [formField]="aiRouteForm.destination"/>
+            <hlm-field-description>Deja que RidersAI decida</hlm-field-description>
+  
+          </hlm-field>
+        </div>
+  
+      </section>
+  
+      <!-- 02/ Trazado -->
+      <section class="mx-5 flex flex-col gap-6 border-t border-border/60 py-5 sm:mx-6 sm:py-6">
+        <div class="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
+          <h2 class="font-mono text-sm font-semibold tracking-[0.12em] text-foreground">
+            02 <span class="text-muted-foreground">//</span> PARÁMETROS DEL TRAZADO
+          </h2>
+          <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Algoritmo V2.4
+          </span>
+        </div>
+  
+        <!-- Curves density (aggresive) -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-sm font-medium text-foreground">Densidad de Curvas &amp; Inclinación</span>
+            <span
+              class="rounded border border-border/60 bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] tabular-nums text-foreground">
+              {{ curveDensity() }}% (Agresivo)
+            </span>
+          </div>
+          <hlm-slider [value]="[curveDensity()]" [min]="0" [max]="100" [step]="1"
+            aria-label="Densidad de curvas e inclinación" (valueChange)="updateCurveDensity($event)" />
+          <div class="flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+            <span>Turismo Suave</span>
+            <span>Sport</span>
+            <span>Rider Extremo</span>
+          </div>
+        </div>
+  
+        <!-- Distance -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-sm font-medium text-foreground">Distancia Objetivo</span>
+            <span
+              class="rounded border border-border/60 bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] tabular-nums text-foreground">
+              {{ estimatedDistance() }} km
+            </span>
+          </div>
+          <hlm-slider [value]="[estimatedDistance()]" [min]="50" [max]="450" [step]="1"
+            aria-label="Distancia estimada en kilómetros" (valueChange)="updateEstimatedDistance($event)" />
+          <div class="flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+            <span>50 km</span>
+            <span>200 km</span>
+            <span>450+ km</span>
+          </div>
+        </div>
+      </section>
+  
+      <!-- 03/ Condiciones/ Submit-->
+      <section class="mx-5 flex flex-col gap-3 border-t border-border/60 py-5 sm:mx-6 sm:py-6">
+        <h2 class="font-mono text-sm font-semibold tracking-[0.12em] text-foreground">
+          03 <span class="text-muted-foreground">//</span> CONDICIONES DE RODADA
+        </h2>
+  
+        <div class="flex items-center gap-3 rounded-lg border border-border/60 bg-white/[0.02] p-3">
+          <ng-icon name="lucideCar" class="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <span class="flex min-w-0 flex-1 flex-col">
+            <span class="text-sm font-medium text-foreground">Evitar Autovías y Tráfico Intenso</span>
+            <span class="text-xs text-muted-foreground">
+              Desviar de circunvalaciones y enlaces rectos
+            </span>
+          </span>
+          <hlm-switch class="ml-auto" (checkedChange)="avoidTraffic.set($event)" [formField]="aiRouteForm.avoid_motorways"
+            aria-label="Evitar autovías y tráfico intenso" />
+        </div>
+  
+        <!-- TODO: Call Metheo API -->
+        <div class="flex items-center gap-3 rounded-lg border border-border/60 bg-white/[0.02] p-3">
+          <ng-icon name="lucideCloudSun" class="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <span class="flex min-w-0 flex-1 flex-col">
+            <span class="text-sm font-medium text-foreground">Radar Meteorológico</span>
+            <span class="text-xs text-muted-foreground">Previsión de suelo seco 100% (21°C)</span>
+          </span>
+          <span
+            class="ml-auto inline-flex shrink-0 items-center rounded border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-mono text-[11px] font-medium tracking-[0.02em] text-emerald-400">
+            Grip Seco
+          </span>
+        </div>
+  
+        <!-- Buttons Form/Export GPX/Reset -->
+        <div class="mt-2 flex flex-col gap-3">
+          <button hlmBtn type="button" type="submit"
+            class="h-11 w-full gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90">
+            <ng-icon name="lucideZap" class="size-4" aria-hidden="true" />
+            Generar Ruta con IA
+          </button>
+          <div class="grid grid-cols-2 gap-3">
+            <button hlmBtn type="button" variant="outline"
+              class="h-10 gap-2 rounded-md border-border/60 bg-white/[0.02] text-sm font-medium">
+              <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
+              Exportar GPX
+            </button>
+            <button hlmBtn type="button" variant="outline"
+              class="h-10 gap-2 rounded-md border-border/60 bg-white/[0.02] text-sm font-medium" (click)="reset()">
+              <ng-icon name="lucideRotateCcw" class="size-4" aria-hidden="true" />
+              Restablecer
+            </button>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+</div>
