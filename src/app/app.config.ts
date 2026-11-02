@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { requestInterceptor } from './core/interceptors/request.interceptor';
 import { provideSpartanHlm } from '@spartan-ng/helm/utils';
-import { Theme } from './ui';
+import { Theme } from './ui/services';
 
 export const appConfig: ApplicationConfig = {
   providers: [
