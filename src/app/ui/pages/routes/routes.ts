@@ -84,8 +84,6 @@ export class Routes {
 
   protected readonly tabs = [
     { id: 'assisted', label: 'Trazada Asistida por IA', icon: 'lucideRoute', count: null },
-    { id: 'presets', label: 'Presets de Carrera', icon: 'lucideSlidersHorizontal', count: null },
-    { id: 'elevation', label: 'Cálculo Altimétrico & Grip', icon: 'lucideTrendingUp', count: null },
     { id: 'history', label: 'Historial de Generaciones', icon: 'lucideHistory', count: 14 },
   ] as const;
   protected readonly activeTab = signal<string>('assisted');
