@@ -4,13 +4,7 @@ import {
   inject,
   signal,
 } from "@angular/core";
-import { NgIcon, provideIcons } from "@ng-icons/core";
-import { lucideCheck } from "@ng-icons/lucide";
-import { HlmInputImports } from "@spartan-ng/helm/input";
-import { HlmSliderImports } from "@spartan-ng/helm/slider";
-import { HlmSwitchImports } from "@spartan-ng/helm/switch";
-import { HlmTextarea } from "@spartan-ng/helm/textarea";
-import { HlmField, HlmFieldDescription } from "@spartan-ng/helm/field";
+import { HttpErrorResponse } from "@angular/common/http";
 import {
   form,
   min,
@@ -18,21 +12,31 @@ import {
   FormRoot,
   FormField,
 } from "@angular/forms/signals";
-import { HttpErrorResponse } from "@angular/common/http";
-import { toast } from "@spartan-ng/brain/sonner";
 import { firstValueFrom } from "rxjs";
+import { NgIcon, provideIcons } from "@ng-icons/core";
+import { lucideCheck, lucideDownload, lucideRotateCcw } from "@ng-icons/lucide";
+import { HlmButtonImports } from "@spartan-ng/helm/button";
+import { HlmCardImports } from "@spartan-ng/helm/card";
+import { HlmField, HlmFieldDescription } from "@spartan-ng/helm/field";
+import { HlmInputImports } from "@spartan-ng/helm/input";
+import { HlmSliderImports } from "@spartan-ng/helm/slider";
+import { HlmSpinnerImports } from "@spartan-ng/helm/spinner";
+import { HlmSwitchImports } from "@spartan-ng/helm/switch";
+import { HlmTextarea } from "@spartan-ng/helm/textarea";
+import { toast } from "@spartan-ng/brain/sonner";
 import { Ollama } from "../../../../shared/services/ollama";
 import {
   AiGenerator,
   AiResponse,
   AiRouteFormModel,
 } from "../../../../shared/interfaces/ai-generator";
-import { HlmSpinnerImports } from "@spartan-ng/helm/spinner";
-import { HlmButtonImports } from "@spartan-ng/helm/button";
 import { NullableTextInput } from "../../../../shared/directives/nullable-text-input";
 import { RouteStore } from "../../store/route.store";
-import { HlmCardImports } from "@spartan-ng/helm/card";
 
+/** Distancia estimada por defecto en kilómetros. */
+const DEFAULT_DISTANCE_KM = 150;
+
+/** Componente de formulario para generar rutas mediante IA a partir de una descripción y preferencias. */
 @Component({
   selector: "app-ai-route",
   imports: [
@@ -52,47 +56,13 @@ import { HlmCardImports } from "@spartan-ng/helm/card";
   ],
   templateUrl: "./ai-route.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideIcons({ lucideCheck })],
+  providers: [provideIcons({ lucideCheck, lucideDownload, lucideRotateCcw })],
 })
 export class AiRoute {
   private _ollama = inject(Ollama);
   private _routeStore = inject(RouteStore);
 
-  protected readonly presets = [
-    "Relajada",
-    "Panorámica Vistas",
-    "Rápida & Fluida",
-    "Circular",
-  ];
-  protected readonly selectedPreset = signal(this.presets[0]);
-  protected readonly estimatedDistance = signal(150);
-  protected readonly avoidMotorways = signal(false);
-  protected readonly preferCurvyRoads = signal(false);
-  public loading = signal<boolean>(false);
-
-  protected selectPreset(preset: string): void {
-    this.selectedPreset.set(preset);
-  }
-
-  protected updateEstimatedDistance(values: number[]): void {
-    this.estimatedDistance.set(values[0] ?? this.estimatedDistance());
-  }
-
-  protected getRouteType() {
-    switch (this.selectedPreset()) {
-      case "Relajada":
-        return "relaxed";
-      case "Panorámica Vistas":
-        return "views";
-      case "Rápida & Fluida":
-        return "fast";
-      case "Circular":
-        return "circular";
-      default:
-        return "tour";
-    }
-  }
-
+  /** Modelo inicial vacío del formulario. */
   private readonly initialModel: AiRouteFormModel = {
     additional_message: "",
     route_type: null,
@@ -104,8 +74,28 @@ export class AiRoute {
     duration_time: null,
   };
 
+  /** Estado reactivo del formulario. */
   private aiRouteModel = signal<AiRouteFormModel>({ ...this.initialModel });
 
+  /** Presets de estilo de ruta disponibles. */
+  protected readonly presets = [
+    "Relajada",
+    "Panorámica Vistas",
+    "Rápida & Fluida",
+    "Circular",
+  ];
+  /** Preset de ruta seleccionado actualmente. */
+  protected readonly selectedPreset = signal(this.presets[0]);
+  /** Distancia estimada en kilómetros. */
+  protected readonly estimatedDistance = signal(DEFAULT_DISTANCE_KM);
+  /** Indica si se deben evitar las autopistas. */
+  protected readonly avoidMotorways = signal(false);
+  /** Indica si se prefieren carreteras con curvas. */
+  protected readonly preferCurvyRoads = signal(false);
+  /** Indica si hay una petición de generación en curso. */
+  public loading = signal<boolean>(false);
+
+  /** Formulario con validaciones y envío a la API de generación de rutas. */
   public aiRouteForm = form(
     this.aiRouteModel,
     (schema) => {
@@ -157,11 +147,38 @@ export class AiRoute {
     },
   );
 
+  /** Selecciona un preset de estilo de ruta. */
+  protected selectPreset(preset: string): void {
+    this.selectedPreset.set(preset);
+  }
+
+  /** Actualiza la distancia estimada a partir del valor del slider. */
+  protected updateEstimatedDistance(values: number[]): void {
+    this.estimatedDistance.set(values[0] ?? this.estimatedDistance());
+  }
+
+  /** Traduce el preset seleccionado al tipo de ruta esperado por la API. */
+  protected getRouteType() {
+    switch (this.selectedPreset()) {
+      case "Relajada":
+        return "relaxed";
+      case "Panorámica Vistas":
+        return "views";
+      case "Rápida & Fluida":
+        return "fast";
+      case "Circular":
+        return "circular";
+      default:
+        return "tour";
+    }
+  }
+
+  /** Restablece el formulario y todas las preferencias a su estado inicial. */
   reset() {
     this.aiRouteModel.set({ ...this.initialModel });
     this.aiRouteForm().reset();
     this.selectedPreset.set(this.presets[0]);
-    this.estimatedDistance.set(150);
+    this.estimatedDistance.set(DEFAULT_DISTANCE_KM);
     this.avoidMotorways.set(false);
     this.preferCurvyRoads.set(false);
     this.loading.set(false);
