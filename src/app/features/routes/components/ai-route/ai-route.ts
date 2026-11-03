@@ -15,6 +15,7 @@ import { AiGenerator, AiResponse, AiRouteFormModel } from '../../../../shared/in
 import { HlmSpinnerImports } from "@spartan-ng/helm/spinner";
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { NullableTextInput } from '../../../../shared/directives/nullable-text-input';
+import { RouteStore } from '../../store/route.store';
 
 
 
@@ -23,16 +24,12 @@ import { NullableTextInput } from '../../../../shared/directives/nullable-text-i
   imports: [NgIcon, HlmSliderImports, HlmSwitchImports, HlmTextarea, HlmInputImports, HlmField, HlmFieldDescription, FormRoot, FormField, HlmSpinnerImports, HlmButtonImports, NullableTextInput],
   templateUrl: './ai-route.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    provideIcons({
-      lucideCheck,
-
-    })
-  ]
+  providers: [ provideIcons({lucideCheck})]
 })
 export class AiRoute {
 
   private _ollama = inject(Ollama)
+  private _routeStore = inject(RouteStore)
 
   protected readonly presets = [
     'Relajada',
@@ -46,7 +43,30 @@ export class AiRoute {
   protected readonly preferCurvyRoads = signal(false);
   public loading = signal<boolean>(false)
 
-  private aiRouteModel = signal<AiRouteFormModel>({
+  protected selectPreset(preset: string): void {
+    this.selectedPreset.set(preset);
+  }
+
+  protected updateEstimatedDistance(values: number[]): void {
+    this.estimatedDistance.set(values[0] ?? this.estimatedDistance());
+  }
+
+  protected getRouteType(){
+    switch(this.selectedPreset()){
+      case 'Relajada':
+        return 'relaxed';
+      case 'Panorámica Vistas':
+        return 'views';
+      case 'Rápida & Fluida':
+        return 'fast';
+      case 'Circular':
+        return 'circular';
+      default:
+        return 'tour'
+    }
+  }
+
+  private readonly initialModel: AiRouteFormModel = {
     additional_message : '',
     route_type : null,
     distance_km : null,
@@ -55,7 +75,9 @@ export class AiRoute {
     origin: '',
     destination: null,
     duration_time: null
-  })
+  }
+
+  private aiRouteModel = signal<AiRouteFormModel>({ ...this.initialModel })
 
   public aiRouteForm = form(
     this.aiRouteModel,
@@ -83,7 +105,9 @@ export class AiRoute {
 
             const response : AiResponse = await firstValueFrom(this._ollama.generateRoute(body))
             this.loading.set(false)
-            // TODO: Control de la respuesta de Ollama.
+            this._routeStore.setRoute(response)
+
+            toast.success("Ruta generada correctamente")
             // TODO: Generar Skeletons, Loader 
             
           } catch (err: unknown) {
@@ -95,29 +119,14 @@ export class AiRoute {
       },
     },
   )
-  
-  protected selectPreset(preset: string): void {
-    this.selectedPreset.set(preset);
-  }
 
-  protected updateEstimatedDistance(values: number[]): void {
-    this.estimatedDistance.set(values[0] ?? this.estimatedDistance());
+  reset(){
+    this.aiRouteModel.set({ ...this.initialModel });
+    this.aiRouteForm().reset();
+    this.selectedPreset.set(this.presets[0]);
+    this.estimatedDistance.set(150);
+    this.avoidMotorways.set(false);
+    this.preferCurvyRoads.set(false);
+    this.loading.set(false);
   }
-
-  protected getRouteType(){
-    switch(this.selectedPreset()){
-      case 'Relajada':
-        return 'relaxed';
-      case 'Panorámica Vistas':
-        return 'views';
-      case 'Rápida & Fluida':
-        return 'fast';
-      case 'Circular':
-        return 'circular';
-      default:
-        return 'tour'
-    }
-  }
-
-  reset(){}
 }
