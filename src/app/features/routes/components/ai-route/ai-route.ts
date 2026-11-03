@@ -6,17 +6,21 @@ import { HlmSliderImports } from "@spartan-ng/helm/slider";
 import { HlmSwitchImports } from "@spartan-ng/helm/switch";
 import { HlmTextarea } from '@spartan-ng/helm/textarea';
 import { HlmField, HlmFieldDescription } from '@spartan-ng/helm/field';
-import { form, required, FormRoot, FormField } from '@angular/forms/signals';
+import { form, min, required, FormRoot, FormField } from '@angular/forms/signals';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
 import { firstValueFrom } from 'rxjs';
 import { Ollama } from '../../../../shared/services/ollama';
-import { AiGenerator, AiResponse } from '../../../../shared/interfaces/ai-generator';
+import { AiGenerator, AiResponse, AiRouteFormModel } from '../../../../shared/interfaces/ai-generator';
+import { HlmSpinnerImports } from "@spartan-ng/helm/spinner";
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { NullableTextInput } from '../../../../shared/directives/nullable-text-input';
+
 
 
 @Component({
   selector: 'app-ai-route',
-  imports: [NgIcon, HlmSliderImports, HlmSwitchImports, HlmTextarea, HlmInputImports, HlmField, HlmFieldDescription, FormRoot, FormField],
+  imports: [NgIcon, HlmSliderImports, HlmSwitchImports, HlmTextarea, HlmInputImports, HlmField, HlmFieldDescription, FormRoot, FormField, HlmSpinnerImports, HlmButtonImports, NullableTextInput],
   templateUrl: './ai-route.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -37,19 +41,20 @@ export class AiRoute {
     'Circular',
   ];
   protected readonly selectedPreset = signal(this.presets[0]);
-  protected readonly curveDensity = signal(50);
   protected readonly estimatedDistance = signal(150);
-  protected readonly asphalt = signal(true);
-  protected readonly avoidTraffic = signal(true);
+  protected readonly avoidMotorways = signal(false);
+  protected readonly preferCurvyRoads = signal(false);
+  public loading = signal<boolean>(false)
 
-  private aiRouteModel = signal({
+  private aiRouteModel = signal<AiRouteFormModel>({
     additional_message : '',
     route_type : null,
     distance_km : null,
     avoid_motorways: false,
     prefer_curvy_roads: false,
     origin: '',
-    destination: ''
+    destination: null,
+    duration_time: null
   })
 
   public aiRouteForm = form(
@@ -57,30 +62,32 @@ export class AiRoute {
     (schema) => {
       required(schema.additional_message, { message: "Escribe el prompt inicial" });
       required(schema.origin, { message: "El punto de partida es obligatorio" });
+      min(schema.duration_time, 0, { message: "La duración no puede ser negativa" });
     },
      {
       submission: {
         action: async (field) => {
           try {
-
-            // FIXME: Duration time missing.
-            // FIXME: avoid_motorways missign
+            this.loading.set(true)
 
             const body : AiGenerator = {
               additional_message: field().value().additional_message,
               route_type : this.getRouteType(),
               distance_km: this.estimatedDistance(),
-              avoid_motorways: this.avoidTraffic(),
-              prefer_curvy_roads: true,
+              avoid_motorways: this.avoidMotorways(),
+              prefer_curvy_roads: this.preferCurvyRoads(),
               origin: field().value().origin,
-              destination: field().value().destination
+              destination: field().value().destination,
+              duration_time: field().value().duration_time ?? null
             }
 
             const response : AiResponse = await firstValueFrom(this._ollama.generateRoute(body))
+            this.loading.set(false)
             // TODO: Control de la respuesta de Ollama.
             // TODO: Generar Skeletons, Loader 
             
           } catch (err: unknown) {
+            this.loading.set(false)
             const { error } = err as HttpErrorResponse;
             toast.error(error.detail ?? 'Ha ocurrido un error al crear la ruta. Intenéntalo de nuevo más tarde.');
           }
@@ -91,10 +98,6 @@ export class AiRoute {
   
   protected selectPreset(preset: string): void {
     this.selectedPreset.set(preset);
-  }
-
-  protected updateCurveDensity(values: number[]): void {
-    this.curveDensity.set(values[0] ?? this.curveDensity());
   }
 
   protected updateEstimatedDistance(values: number[]): void {
