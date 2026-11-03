@@ -30,6 +30,7 @@ import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { areaY, defineChart, dot, lineY } from '@tanstack/charts';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
 import { tooltip } from '@tanstack/charts/tooltip';
+import { AiRoute } from '../../../features';
 
 interface ElevationPoint {
   km: number;
@@ -46,7 +47,8 @@ interface ElevationPoint {
     HlmSliderImports,
     HlmSwitchImports,
     HlmTextareaImports,
-  ],
+    AiRoute
+],
   templateUrl: './routes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -61,7 +63,7 @@ interface ElevationPoint {
       lucideLayers,
       lucideMap,
       lucideMinus,
-          lucidePlus,
+      lucidePlus,
       lucideRefreshCw,
       lucideRotateCcw,
       lucideRoute,
@@ -82,25 +84,10 @@ export class Routes {
 
   protected readonly tabs = [
     { id: 'assisted', label: 'Trazada Asistida por IA', icon: 'lucideRoute', count: null },
-    { id: 'presets', label: 'Presets de Carrera', icon: 'lucideSlidersHorizontal', count: null },
-    { id: 'elevation', label: 'Cálculo Altimétrico & Grip', icon: 'lucideTrendingUp', count: null },
     { id: 'history', label: 'Historial de Generaciones', icon: 'lucideHistory', count: 14 },
   ] as const;
   protected readonly activeTab = signal<string>('assisted');
 
-  protected readonly presets = [
-    'Curvas Técnicas',
-    'Panorámica Vistas',
-    'Rápida & Fluida',
-    'Trail Mixto',
-  ];
-  protected readonly selectedPreset = signal(this.presets[0]);
-
-  protected readonly curveDensity = signal(88);
-  protected readonly estimatedDistance = signal(218);
-
-  protected readonly asphalt = signal(true);
-  protected readonly avoidTraffic = signal(true);
 
   protected readonly mapZoom = signal(1);
   protected readonly mapTransform = computed(
@@ -226,18 +213,6 @@ export class Routes {
     this.activeTab.set(tabId);
   }
 
-  protected selectPreset(preset: string): void {
-    this.selectedPreset.set(preset);
-  }
-
-  protected updateCurveDensity(values: number[]): void {
-    this.curveDensity.set(values[0] ?? this.curveDensity());
-  }
-
-  protected updateEstimatedDistance(values: number[]): void {
-    this.estimatedDistance.set(values[0] ?? this.estimatedDistance());
-  }
-
   protected selectWaypoint(index: number): void {
     this.activeWaypoint.set(index);
   }
@@ -257,11 +232,6 @@ export class Routes {
   protected reset(): void {
     this.description.set(this.initialDescription);
     this.activeTab.set('assisted');
-    this.selectedPreset.set(this.presets[0]);
-    this.curveDensity.set(88);
-    this.estimatedDistance.set(218);
-    this.asphalt.set(true);
-    this.avoidTraffic.set(true);
     this.mapZoom.set(1);
     this.showRelief.set(true);
     this.activeWaypoint.set(0);
