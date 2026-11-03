@@ -12,7 +12,7 @@ export class Ollama {
 
   /** Call Ollama API for generate custom routes */
   generateRoute(body: AiGenerator): Observable<AiResponse> {
-    return this._http.post<AiResponse>('api/ai/generate/', body)
+    return this._http.post<AiResponse>('ai/generate/', body)
   }
 
   

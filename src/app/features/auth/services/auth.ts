@@ -12,10 +12,10 @@ export class Auth {
 
   /** Ruta para obtener el par de tokens. */
   authenticate(body: LoginRequest): Observable<ResponseLogin>{
-    return this._hhtp.post<ResponseLogin>('api/login', body)
+    return this._hhtp.post<ResponseLogin>('login', body)
   }
 
   register(body : SignUpRequest): Observable<ResponseSignUp>{
-    return this._hhtp.post<ResponseSignUp>('api/user/', body)
+    return this._hhtp.post<ResponseSignUp>('user/', body)
   }
 }

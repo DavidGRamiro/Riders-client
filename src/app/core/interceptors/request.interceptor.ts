@@ -15,7 +15,7 @@ export function requestInterceptor(
   
   const isLoginUrl = req.url.includes('login');
   const isNewUser = req.url.includes('/user') && req.method === 'POST';
-  const BASE_URL = `${env.URL_BACKEND}${req.url}` 
+  const BASE_URL = `${env.URL_BACKEND}${env.PREFIX}${req.url}` 
   
   let request = req;
 
