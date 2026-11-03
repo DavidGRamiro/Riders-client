@@ -10,8 +10,8 @@ import { form, required, FormRoot, FormField } from '@angular/forms/signals';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
 import { firstValueFrom } from 'rxjs';
-import { Ollama } from '../../../../services/ollama';
-import { AiGenerator, AiResponse } from '../../../../interfaces/ai-generator';
+import { Ollama } from '../../../../shared/services/ollama';
+import { AiGenerator, AiResponse } from '../../../../shared/interfaces/ai-generator';
 
 
 @Component({
