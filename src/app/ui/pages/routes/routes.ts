@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideHistory,
@@ -7,27 +7,12 @@ import {
   lucideSparkles,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmCardImports } from '@spartan-ng/helm/card';
-import { HlmChartImports } from '@spartan-ng/helm/chart';
-import { HlmSliderImports } from '@spartan-ng/helm/slider';
-import { HlmSwitchImports } from '@spartan-ng/helm/switch';
-import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { AiRoute, AiRouteDetails } from '../../../features';
 
 
 @Component({
   selector: 'app-routes',
-  imports: [
-    NgIcon,
-    HlmButtonImports,
-    HlmCardImports,
-    HlmChartImports,
-    HlmSliderImports,
-    HlmSwitchImports,
-    HlmTextareaImports,
-    AiRoute,
-    AiRouteDetails
-],
+  imports: [NgIcon, HlmButtonImports, AiRoute, AiRouteDetails],
   templateUrl: './routes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
