@@ -6,6 +6,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { requestInterceptor } from './core/interceptors/request.interceptor';
 import { provideSpartanHlm } from '@spartan-ng/helm/utils';
 import { Theme } from './ui/services';
+import { refreshPageInitializer } from './core/init';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +18,8 @@ export const appConfig: ApplicationConfig = {
       // Config to set by default in the app.
       const theme = inject(Theme);
       theme.userTheme();
+
+      return refreshPageInitializer()
     })
   ]
 };

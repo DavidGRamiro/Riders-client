@@ -10,16 +10,16 @@ export function requestInterceptor(
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {  
 
-  const _authStore = inject(AuthStore)
+  const _authStore = inject(AuthStore);
   const token = _authStore.accessToken();
   
-  const isLoginUrl = req.url.includes('login');
+  const isPublicUrl = req.url.includes('login') || req.url.includes('refresh');
   const isNewUser = req.url.includes('/user') && req.method === 'POST';
   const BASE_URL = `${env.URL_BACKEND}${env.PREFIX}${req.url}` 
   
   let request = req;
 
-  if(isLoginUrl || isNewUser){
+  if(isPublicUrl || isNewUser){
     request = req.clone({ url: BASE_URL })
   }else{
     request = req.clone({
