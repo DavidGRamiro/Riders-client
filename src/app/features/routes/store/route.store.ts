@@ -1,4 +1,4 @@
-import { patchState, signalState, signalStore, withMethods, withState } from "@ngrx/signals";
+import { getState, patchState, signalState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 import { AiResponse } from "../../../shared/interfaces/ai-generator";
 
 
@@ -27,6 +27,11 @@ export const RouteStore = signalStore(
     //Clear to initialState de routes state
     clearRoute(){
       patchState(store, initialState)
+    },
+
+    // Get all Route data
+    getRoute(): AiResponse {
+      return getState(store) as AiResponse
     }
   }))
 
