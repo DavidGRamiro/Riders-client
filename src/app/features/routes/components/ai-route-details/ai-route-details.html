@@ -1,5 +1,5 @@
 <div class="flex min-w-0 flex-col gap-6">
-  <app-route-title />
+  <app-route-title [title]="title()" [pointsOfRoutes]="pointsOfRoutes()" [distance]="distance()" [time]="time" />
   <app-route-map />
   <app-route-analytics />
 </div>
