@@ -63,6 +63,8 @@ export class Signin {
             this._authStore.setTokens(access, refresh);
             this._userStore.setUser(extra_data)
             this._router.navigate(['/home'])
+            // Set LocalStorage token
+            localStorage.setItem('refresh', refresh)
           } catch (err: unknown) {
             const { error } = err as HttpErrorResponse
              toast.error(error.detail)

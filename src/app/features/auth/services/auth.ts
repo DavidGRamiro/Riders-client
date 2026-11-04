@@ -15,7 +15,13 @@ export class Auth {
     return this._hhtp.post<ResponseLogin>('login', body)
   }
 
+  /** Register new user in the app */
   register(body : SignUpRequest): Observable<ResponseSignUp>{
     return this._hhtp.post<ResponseSignUp>('user/', body)
+  }
+
+  /** Refresh access token, used when we reload the page */
+  refresh(refresh: string): Observable<ResponseLogin>{
+    return this._hhtp.post<ResponseLogin>('refresh', { refresh })
   }
 }

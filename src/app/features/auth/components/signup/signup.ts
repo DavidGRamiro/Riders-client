@@ -124,7 +124,7 @@ export class Signup {
             this._authStore.setTokens(token, refresh);
             this._userStore.setUser( { username: user, is_online, authenticated: true });
 
-            // TODO: Manage delay and set up spinner view
+            localStorage.setItem('refresh', refresh)
             this._router.navigate(['/home']);
           } catch (err: unknown) {
             const { error } = err as HttpErrorResponse;
