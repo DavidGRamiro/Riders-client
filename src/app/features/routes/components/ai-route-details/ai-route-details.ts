@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit } from '@angular/core';
 import { RouteTitle } from './route-title/route-title';
-import { RouteMap } from './route-map/route-map';
+import { RouteMap, RouteMapMarker } from './route-map/route-map';
 import { RouteAnalytics } from './route-analytics/route-analytics';
 import { RouteStore } from '../../store/route.store';
+import type { GeoResponse } from '../../../../shared/interfaces/ai-generator';
+import type { LatLngTuple } from 'leaflet';
 
 @Component({
   selector: 'app-ai-route-details',
@@ -43,7 +45,40 @@ export class AiRouteDetails{
     return 0
   })
 
-  // TODO: Definir en backend el tiempo estimado horas/minutos.
-  /** Tiempo estimado de la ruta (pendiente de definir en backend). */
+  /** TODO:  Tiempo estimado de la ruta (pendiente de definir en backend). */
   public time: number = 0;
+
+  /** Puntos de la ruta obtenidos de las coordenadas generadas por la IA. */
+  public route = computed<LatLngTuple[]>(() =>
+    (this._routeStore.coords?.() ?? [])
+      .filter(
+        (item): item is GeoResponse & { lat: number; lon: number } =>
+          typeof item.lat === 'number' && typeof item.lon === 'number',
+      )
+      .map((item) => [item.lat, item.lon]),
+  );
+
+  /** Marcadores de la ruta generada a partir de sus coordenadas. */
+  public markers = computed<RouteMapMarker[]>(() => {
+    const coords = this._routeStore.coords?.() ?? [];
+
+    return coords
+      .filter(
+        (item): item is GeoResponse & { lat: number; lon: number } =>
+          typeof item.lat === 'number' && typeof item.lon === 'number',
+      )
+      .map((item) => ({
+          label: item.location,
+        position: [item.lat, item.lon],
+      }));
+  });
+
+  /** Título del mapa con el origen y el destino. */
+  public titleMap = computed<string>(() => {
+    const firstLastPoint = this._routeStore.way_points()
+    if(firstLastPoint.length > 0){
+      return firstLastPoint[0] + ' - ' + firstLastPoint[firstLastPoint.length - 1]
+    }
+    return 'Mapa de ruta'
+  })
 }

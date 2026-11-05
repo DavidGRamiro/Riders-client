@@ -13,7 +13,7 @@ export interface AiResponse {
   title: string;
   origin: string;
   destination: string;
-  way_points: [];
+  way_points: string[];
   route_type: string;
   prefer_curvy_roads: boolean;
   distance_estimated_km: number;
