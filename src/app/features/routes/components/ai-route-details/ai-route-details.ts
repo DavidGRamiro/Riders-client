@@ -50,7 +50,7 @@ export class AiRouteDetails{
 
   /** Puntos de la ruta obtenidos de las coordenadas generadas por la IA. */
   public route = computed<LatLngTuple[]>(() =>
-    (this._routeStore.coords?.() ?? [])
+    (this._routeStore.coords() ?? [])
       .filter(
         (item): item is GeoResponse & { lat: number; lon: number } =>
           typeof item.lat === 'number' && typeof item.lon === 'number',
@@ -60,7 +60,7 @@ export class AiRouteDetails{
 
   /** Marcadores de la ruta generada a partir de sus coordenadas. */
   public markers = computed<RouteMapMarker[]>(() => {
-    const coords = this._routeStore.coords?.() ?? [];
+    const coords = this._routeStore.coords() ?? [];
 
     return coords
       .filter(

@@ -17,7 +17,7 @@ export interface AiResponse {
   route_type: string;
   prefer_curvy_roads: boolean;
   distance_estimated_km: number;
-  coords?: GeoResponse[];
+  coords: GeoResponse[];
 }
 
 export interface GeoResponse {

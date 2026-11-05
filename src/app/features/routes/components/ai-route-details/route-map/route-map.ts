@@ -65,7 +65,7 @@ export class RouteMap {
   readonly title = input('Comienza a explorar una nueva zona.');
 
   /** Altura CSS del contenedor del mapa. */
-  readonly height = input('600px');
+  readonly height = input('450px');
 
   /** Etiqueta accesible del mapa. */
   readonly ariaLabel = input('Mapa visualizador de rutas');

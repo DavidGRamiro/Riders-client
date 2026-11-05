@@ -1,89 +1,157 @@
 <div hlmCard class="gap-0 overflow-hidden bg-white/[0.02]! py-0">
-  <div class="flex flex-col gap-4 p-5 sm:p-5">
-      <div class="flex flex-col gap-3 border-b border-border/60 pb-4 sm:flex-row sm:items-start sm:justify-between">
-        <div class="flex flex-col gap-1">
-          <h2 hlmCardTitle class="text-base font-semibold">Perfil Altimétrico &amp; Desnivel</h2>
-          <p hlmCardDescription>Topografía acumulada y tramos de mayor inclinación.</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-          <span class="flex items-center gap-1.5">
-            <span class="h-0.5 w-4 rounded-full bg-foreground" aria-hidden="true"></span>
-            Elevación
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="size-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" aria-hidden="true"></span>
-            Pico Máximo
-          </span>
-        </div>
+  <div hlmCardHeader class="border-b border-border/60 p-5!">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div class="flex flex-col gap-1">
+        <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          Resumen de ruta
+        </span>
+        <h2 hlmCardTitle class="text-base font-semibold">Itinerario y acciones</h2>
+        <p hlmCardDescription>
+          Revisa el recorrido y guarda la ruta para tenerla a mano en tu garaje.
+        </p>
       </div>
 
-      <div class="rounded-lg border border-border/60 bg-white/[0.01] p-2">
-        TAN STACK CHART 
-        <!-- <tanstack-chart hlmChart [options]="elevationChart" class="block w-full" /> -->
-      </div>
-
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="flex flex-col gap-1.5 rounded-lg border border-border/60 bg-white/[0.02] p-4">
-          <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
-            Elevación Máx.
-          </span>
-          <span class="text-xl font-semibold leading-none text-foreground">
-            1.858 <span class="text-xs font-medium text-muted-foreground">m</span>
-          </span>
-          <span class="text-xs text-muted-foreground">Pto. Navacerrada</span>
-        </div>
-        <div class="flex flex-col gap-1.5 rounded-lg border border-border/60 bg-white/[0.02] p-4">
-          <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
-            Desnivel Acum.
-          </span>
-          <span class="text-xl font-semibold leading-none text-foreground">
-            +2.450 <span class="text-xs font-medium text-muted-foreground">m</span>
-          </span>
-          <span class="text-xs text-muted-foreground">3 puertos 1ª cat.</span>
-        </div>
-        <div class="flex flex-col gap-1.5 rounded-lg border border-border/60 bg-white/[0.02] p-4">
-          <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
-            Densidad Curvas
-          </span>
-          <span class="text-xl font-semibold leading-none text-foreground">
-            65 <span class="text-xs font-medium text-muted-foreground">/ 100km</span>
-          </span>
-          <span class="text-xs text-muted-foreground">Radio &lt; 30m</span>
-        </div>
-        <div class="flex flex-col gap-1.5 rounded-lg border border-border/60 bg-white/[0.02] p-4">
-          <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
-            Índice de Grip
-          </span>
-          <span class="text-xl font-semibold leading-none text-emerald-400">
-            94% <span class="text-sm font-semibold">A+</span>
-          </span>
-          <span class="text-xs text-muted-foreground">Telemetría Seco</span>
-        </div>
-      </div>
-    </div>
-
-   <div hlmCardFooter
-      class="flex-col gap-4 border-t border-border/60 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-      <span class="flex max-w-64 items-start gap-2 text-sm text-muted-foreground">
-        <span class="mt-1.5 size-2 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
-        <span>Trazada lista para exportar o sincronizar con montura.</span>
+      <span
+        [class]="
+          hasRoute()
+            ? 'inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-emerald-400'
+            : 'inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md border border-border/60 bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground'
+        "
+      >
+        <ng-icon
+          [name]="hasRoute() ? 'lucideCheck' : 'lucideRoute'"
+          class="size-3.5"
+          aria-hidden="true"
+        />
+        {{ hasRoute() ? 'Lista para guardar' : 'Sin ruta generada' }}
       </span>
-      <div class="flex flex-wrap items-center gap-2">
-        <button hlmBtn type="button" variant="outline"
-          class="h-10 gap-2 rounded-md border-border/60 bg-white/[0.02] text-sm font-medium">
-          <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
-          Guardar en Garaje
-        </button>
-        <button hlmBtn type="button" variant="outline"
-          class="h-10 gap-2 rounded-md border-border/60 bg-white/[0.02] text-sm font-medium">
-          <ng-icon name="lucideRefreshCw" class="size-4" aria-hidden="true" />
-          Sincronizar TFT
-        </button>
-        <button hlmBtn type="button"
-          class="h-10 gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90">
-          <ng-icon name="lucideMap" class="size-4" aria-hidden="true" />
-          Hoja de Ruta
-        </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 p-5">
+    <div class="rounded-lg border border-border/60 bg-white/[0.01] p-4">
+      <div class="flex items-start gap-3">
+        <div class="flex flex-col items-center gap-1 pt-1" aria-hidden="true">
+          <span class="size-2.5 rounded-full border-2 border-emerald-400 bg-emerald-400/20"></span>
+          <span class="h-8 w-px bg-border"></span>
+          <ng-icon name="lucideMapPin" class="size-4 text-muted-foreground" />
+          <span class="h-8 w-px bg-border"></span>
+          <ng-icon name="lucideFlag" class="size-4 text-foreground" />
+        </div>
+
+        <div class="flex min-w-0 flex-1 flex-col gap-4">
+          <div class="flex flex-col gap-0.5">
+            <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+              Salida
+            </span>
+            <span class="truncate text-sm font-medium text-foreground">{{ origin() }}</span>
+          </div>
+
+          @if (wayPoints().length > 0) {
+            <div class="flex flex-wrap gap-1.5">
+              @for (point of wayPoints(); track $index) {
+                <span
+                  class="inline-flex items-center gap-1 rounded border border-border/60 bg-white/[0.03] px-2 py-1 text-xs text-muted-foreground"
+                >
+                  <ng-icon name="lucideMapPin" class="size-3" aria-hidden="true" />
+                  {{ point }}
+                </span>
+              }
+            </div>
+          } @else {
+            <span class="text-xs text-muted-foreground">
+              Ruta directa sin paradas intermedias.
+            </span>
+          }
+
+          <div class="flex flex-col gap-0.5">
+            <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+              Llegada
+            </span>
+            <span class="truncate text-sm font-medium text-foreground">{{ destination() }}</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div class="flex flex-col gap-1 rounded-lg border border-border/60 bg-white/[0.02] p-3">
+        <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+          Distancia
+        </span>
+        <span class="text-lg font-semibold leading-none text-foreground">
+          {{ distance() }}
+          <span class="text-xs font-medium text-muted-foreground">km</span>
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-1 rounded-lg border border-border/60 bg-white/[0.02] p-3">
+        <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+          Paradas
+        </span>
+        <span class="text-lg font-semibold leading-none text-foreground">
+          {{ wayPoints().length }}
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-1 rounded-lg border border-border/60 bg-white/[0.02] p-3">
+        <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+          Puntos GPS
+        </span>
+        <span class="text-lg font-semibold leading-none text-foreground">{{ gpsPoints() }}</span>
+      </div>
+
+      <div class="flex flex-col gap-1 rounded-lg border border-border/60 bg-white/[0.02] p-3">
+        <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+          Modo
+        </span>
+        <span class="text-sm font-semibold leading-none text-foreground">{{ routeType() }}</span>
+      </div>
+    </div>
+
+    <p class="flex items-start gap-2 text-xs text-muted-foreground">
+      <ng-icon name="lucideGauge" class="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+      <span>
+        {{ prefersCurves() ? 'Trazado priorizando carreteras con curvas.' : 'Trazado optimizado para fluidez y ritmo.' }}
+        {{ gpsPoints() }} puntos GPS registrados para la navegación.
+      </span>
+    </p>
+  </div>
+
+  <div hlmCardFooter class="flex-col gap-2 border-t border-border/60 p-5 sm:flex-row sm:items-center">
+    <button
+      hlmBtn
+      type="button"
+      [disabled]="!hasRoute()"
+      (click)="saveRoute()"
+      class="h-11 w-full gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90 sm:w-auto sm:px-6"
+    >
+      <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
+      Guardar ruta
+    </button>
+
+    <button
+      hlmBtn
+      type="button"
+      variant="outline"
+      [disabled]="!hasRoute()"
+      (click)="shareRoute()"
+      class="h-11 w-full gap-2 rounded-md border-border/60 bg-white/[0.02] text-sm font-medium sm:w-auto"
+    >
+      <ng-icon name="lucideShare2" class="size-4" aria-hidden="true" />
+      Compartir
+    </button>
+
+    <button
+      hlmBtn
+      type="button"
+      variant="outline"
+      [disabled]="!hasRoute()"
+      (click)="exportGpx()"
+      class="h-11 w-full gap-2 rounded-md border-border/60 bg-white/[0.02] text-sm font-medium sm:w-auto"
+    >
+      <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
+      Descargar GPX
+    </button>
+  </div>
 </div>
