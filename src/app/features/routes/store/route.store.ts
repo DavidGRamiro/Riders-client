@@ -1,16 +1,23 @@
-import { getState, patchState, signalState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
-import { AiResponse } from "../../../shared/interfaces/ai-generator";
+import { getState, patchState, signalStore, withMethods, withState } from "@ngrx/signals";
+import { RouteResponse } from "../../../shared/interfaces/ai-generator";
 
 
-const initialState : AiResponse = {
-  title: '',
-  origin: '',
-  destination: '',
-  way_points: [],
-  route_type: '',
-  prefer_curvy_roads: false,
-  distance_estimated_km: 0,
-  coords: []
+const initialState : RouteResponse = {
+  ollama : {
+    avoid_motorways: false,
+    destination: '',
+    distance_estimated_km: 0,
+    origin: '',
+    prefer_curvy_roads: false,
+    route_type: '',
+    title: '',
+    way_points: [],
+  },
+  route_engine: {
+    distance: 0,
+    duration: 0,
+    coordinates: [],
+  }
 }
 
 export const RouteStore = signalStore(
@@ -20,7 +27,7 @@ export const RouteStore = signalStore(
   withMethods((store) => ({
 
     // Set de new route generated to the store
-    setRoute(route : AiResponse){
+    setRoute(route : RouteResponse){
       patchState(store, route)
     },
 
@@ -30,8 +37,8 @@ export const RouteStore = signalStore(
     },
 
     // Get all Route data
-    getRoute(): AiResponse {
-      return getState(store) as AiResponse
+    getRoute(): RouteResponse {
+      return getState(store)
     }
   }))
 
