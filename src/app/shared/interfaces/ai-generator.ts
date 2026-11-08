@@ -9,27 +9,31 @@ export interface AiGenerator {
   prefer_curvy_roads: boolean;
 }
 
-export interface AiResponse {
-  title: string;
-  origin: string;
+export interface OllamaResponse {
+  avoid_motorways: boolean;
   destination: string;
-  way_points: string[];
-  route_type: string;
-  prefer_curvy_roads: boolean;
   distance_estimated_km: number;
-  coords: GeoResponse[];
+  origin: string;
+  prefer_curvy_roads: boolean;
+  route_type: string;
+  title: string;
+  way_points: string[];
 }
 
-export interface GeoResponse {
-  location?: string;
-  altitude?: number;
-  lat?: number;
-  lon?: number;
-  name?: string | null;
-  position?: string;
-  msg?: string;
-  detail?: string;
-  err?: string;
+export interface RouteResponse {
+  ollama: OllamaResponse;
+  route_engine : RouteEngineResponse;
+}
+
+export interface RouteEngineResponse {
+  distance: number;
+  duration: number;
+  coordinates: CoordinatesEngine[]
+}
+
+export interface CoordinatesEngine {
+  lat: number;
+  lon: number;
 }
 
 export interface AiRouteFormModel {
