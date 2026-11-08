@@ -27,8 +27,8 @@ import { toast } from "@spartan-ng/brain/sonner";
 import { Ollama } from "../../../../shared/services/ollama";
 import {
   AiGenerator,
-  AiResponse,
   AiRouteFormModel,
+  RouteResponse,
 } from "../../../../shared/interfaces/ai-generator";
 import { NullableTextInput } from "../../../../shared/directives/nullable-text-input";
 import { RouteStore } from "../../store/route.store";
@@ -126,14 +126,13 @@ export class AiRoute {
               duration_time: field().value().duration_time ?? null,
             };
 
-            const response: AiResponse = await firstValueFrom(
+            const response: RouteResponse = await firstValueFrom(
               this._ollama.generateRoute(body),
             );
             this.loading.set(false);
+            console.log('Respuesta',response);
             this._routeStore.setRoute(response);
-
             toast.success("Ruta generada correctamente");
-            // TODO: Generar Skeletons, Loader
           } catch (err: unknown) {
             this.loading.set(false);
             const { error } = err as HttpErrorResponse;
@@ -174,7 +173,7 @@ export class AiRoute {
   }
 
   /** Restablece el formulario y todas las preferencias a su estado inicial. */
-  reset() {
+  public reset() {
     this.aiRouteModel.set({ ...this.initialModel });
     this.aiRouteForm().reset();
     this.selectedPreset.set(this.presets[0]);
