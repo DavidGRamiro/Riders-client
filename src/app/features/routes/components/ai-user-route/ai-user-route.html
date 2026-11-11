@@ -1,0 +1,184 @@
+<div class="flex w-full min-w-0 flex-col gap-6">
+  <!-- Buscador y filtros -->
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div class="relative w-full lg:max-w-md">
+      <label for="ai-user-route-search" class="sr-only">
+        Buscar por puerto, comarca o prompt
+      </label>
+      <ng-icon
+        name="lucideSearch"
+        class="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+      />
+      <input
+        id="ai-user-route-search"
+        type="search"
+        placeholder="Buscar por puerto, comarca o prompt..."
+        [value]="searchTerm()"
+        class="h-11 w-full rounded-md border border-border/60 bg-white/[0.02] pl-10 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+      />
+        <!-- /* (input)="updateSearch($event)" */ -->
+      <kbd
+        class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-border/60 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground"
+      >
+        ⌘K
+      </kbd>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <label for="ai-user-route-asphalt" class="sr-only">Filtrar por tipo de asfalto</label>
+      <hlm-native-select
+        selectId="ai-user-route-asphalt"
+        [value]="asphaltFilter()"
+        selectClass="h-11 min-w-44 border-border/60 bg-white/[0.02] text-sm text-muted-foreground"
+      >
+        <!-- /* (valueChange)="updateAsphalt($event)" */ -->
+        <option hlmNativeSelectOption value="all">Todos los asfaltos</option>
+        <option hlmNativeSelectOption value="asphalt">Solo asfalto</option>
+        <option hlmNativeSelectOption value="mixed">Mixto / Trail</option>
+      </hlm-native-select>
+
+      <label for="ai-user-route-sort" class="sr-only">Ordenar generaciones</label>
+      <hlm-native-select
+        selectId="ai-user-route-sort"
+        [value]="sortOrder()"
+        selectClass="h-11 min-w-40 border-border/60 bg-white/[0.02] text-sm text-muted-foreground"
+      >
+        <!-- /* (valueChange)="updateSortOrder($event)" */ -->
+        <option hlmNativeSelectOption value="recent">Más recientes</option>
+        <option hlmNativeSelectOption value="oldest">Más antiguas</option>
+        <option hlmNativeSelectOption value="distance">Mayor distancia</option>
+      </hlm-native-select>
+
+      <div
+        class="flex h-11 items-center gap-2.5 rounded-md border border-border/60 bg-white/[0.02] px-3.5"
+      >
+        <hlm-switch
+          inputId="ai-user-route-only-gpx"
+          size="sm"
+          [checked]="onlyGpx()"
+          (checkedChange)="onlyGpx.set($event)"
+          aria-label="Mostrar solo rutas con GPX"
+        />
+        <label
+          for="ai-user-route-only-gpx"
+          class="cursor-pointer select-none text-sm font-medium text-muted-foreground"
+        >
+          Solo GPX
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rutas destacadas -->
+  <div class="flex flex-col gap-4">
+    @for (route of userRoutes(); track route.id) {
+      <article
+        class="flex flex-col gap-5 rounded-xl border border-border/60 bg-white/[0.02] p-5 transition-colors hover:border-border sm:p-6"
+        [attr.aria-labelledby]="'route-' + route.id + '-title'"
+      >
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex min-w-0 flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
+            <!-- FIXME: Asignar highlight (Ultima ruta generada) -->
+            <!-- @if (route.highlight) {
+              <span
+                class="rounded bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-background"
+              >
+                {{ route.highlight }}
+              </span>
+            } -->
+            <!-- TODO: Asignar code de ruta -->
+            <!-- <span>{{ route.code }}</span> -->
+            <span aria-hidden="true">·</span>
+            <span>{{ route.created_at | date:"dd/MM/yyyy HH:mm" }}</span>
+            <span aria-hidden="true">·</span>
+            <!-- TODO: Asignar bike model  -->
+            <!-- <span class="inline-flex items-center gap-1.5">
+              <ng-icon name="lucideBike" class="size-3.5" aria-hidden="true" />
+              {{ route.bike }}
+            </span> -->
+          </div>
+
+          <div class="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
+            >
+              <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
+              .GPX
+            </button>
+          </div>
+        </div>
+
+        <h3
+          [attr.id]="'route-' + route.id + '-title'"
+          class="text-lg font-semibold tracking-tight text-foreground"
+        >
+        <!-- TODO: Asignar titulo de ruta. -->
+          <!-- {{ route.title }} -->
+          {{ 'Titulo de ruta' }}
+        </h3>
+
+        <p
+          class="rounded-md border border-border/60 bg-white/[0.015] px-4 py-3 text-sm leading-relaxed text-muted-foreground italic"
+        >
+        <!-- TODO: Asignar prompt usado -->
+          <!-- “{{ route.summary }}” -->
+          “{{ 'PROMPT utilizado' }}”
+
+        </p>
+
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
+          <!-- FIXME: Asignar las metricas en un array de objeto -->
+          <!-- @for (metric of route.metrics; track metric.label) {
+            <div class="flex flex-col gap-1">
+              <dt class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                {{ metric.label }}
+              </dt>
+              <dd class="text-sm font-semibold text-foreground">{{ metric.value }}</dd>
+            </div>
+          } -->
+        </dl>
+
+        <!-- TODO: Agregar componete de mapa. -->
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+          <span class="font-mono text-[10px] uppercase tracking-[0.14em]">Hitos:</span>
+          <span class="text-[11px] leading-relaxed">{{ route.waypoints }}</span>
+        </p>
+      </article>
+    } 
+  </div>
+
+  <!-- Paginación -->
+  <!-- <div
+    class="flex flex-col gap-4 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <p class="text-sm text-muted-foreground" aria-live="polite">
+      Mostrando
+      <span class="font-semibold text-foreground">{{ filteredRoutes().length }}</span>
+      de {{ totalGenerations }} generaciones
+    </p>
+
+    <nav class="flex items-center gap-2" aria-label="Paginación del historial de rutas">
+      <button
+        type="button"
+        [disabled]="page() === 1"
+        (click)="previousPage()"
+        class="inline-flex h-9 items-center rounded-md border border-border/60 px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Anterior
+      </button>
+      <span class="px-2 font-mono text-[11px] text-muted-foreground">
+        Página <span class="font-semibold text-foreground">{{ page() }}</span> de {{ pageCount }}
+      </span>
+      <button
+        type="button"
+        [disabled]="page() === pageCount"
+        (click)="nextPage()"
+        class="inline-flex h-9 items-center rounded-md border border-border/60 px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Siguiente
+      </button>
+    </nav>
+  </div> -->
+</div>

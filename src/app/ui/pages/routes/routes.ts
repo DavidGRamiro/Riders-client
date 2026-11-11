@@ -7,12 +7,12 @@ import {
   lucideSparkles,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { AiRoute, AiRouteDetails } from '../../../features';
+import { AiRoute, AiRouteDetails, AiUserRoute } from '../../../features';
 
 
 @Component({
   selector: 'app-routes',
-  imports: [NgIcon, HlmButtonImports, AiRoute, AiRouteDetails],
+  imports: [NgIcon, HlmButtonImports, AiRoute, AiRouteDetails, AiUserRoute],
   templateUrl: './routes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
