@@ -8,7 +8,10 @@ export interface RouteAiResponse {
   distance_km: number;
   route_type:string;
   saved: boolean;
-  waypoints: string[]
+  waypoints: string[];
+  title: string;
+  prompt: string;
+  route_code: string;
 }
 
 interface AiCoords {

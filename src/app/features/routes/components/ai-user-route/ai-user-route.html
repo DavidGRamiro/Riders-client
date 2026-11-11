@@ -88,7 +88,7 @@
               </span>
             } -->
             <!-- TODO: Asignar code de ruta -->
-            <!-- <span>{{ route.code }}</span> -->
+            <span>{{ route.route_code }}</span>
             <span aria-hidden="true">·</span>
             <span>{{ route.created_at | date:"dd/MM/yyyy HH:mm" }}</span>
             <span aria-hidden="true">·</span>
@@ -114,18 +114,13 @@
           [attr.id]="'route-' + route.id + '-title'"
           class="text-lg font-semibold tracking-tight text-foreground"
         >
-        <!-- TODO: Asignar titulo de ruta. -->
-          <!-- {{ route.title }} -->
-          {{ 'Titulo de ruta' }}
+          {{ route.title }}
         </h3>
 
         <p
           class="rounded-md border border-border/60 bg-white/[0.015] px-4 py-3 text-sm leading-relaxed text-muted-foreground italic"
         >
-        <!-- TODO: Asignar prompt usado -->
-          <!-- “{{ route.summary }}” -->
-          “{{ 'PROMPT utilizado' }}”
-
+          “{{ route.prompt }}”
         </p>
 
         <dl class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
