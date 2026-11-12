@@ -149,7 +149,6 @@ export class RouteMap {
       if (!this._mapReady()) {
         return;
       }
-
       this._map?.setView(this.center(), this.zoom());
     });
 

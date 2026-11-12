@@ -79,24 +79,10 @@
       >
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex min-w-0 flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
-            <!-- FIXME: Asignar highlight (Ultima ruta generada) -->
-            <!-- @if (route.highlight) {
-              <span
-                class="rounded bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-background"
-              >
-                {{ route.highlight }}
-              </span>
-            } -->
-            <!-- TODO: Asignar code de ruta -->
             <span>{{ route.route_code }}</span>
             <span aria-hidden="true">·</span>
             <span>{{ route.created_at | date:"dd/MM/yyyy HH:mm" }}</span>
             <span aria-hidden="true">·</span>
-            <!-- TODO: Asignar bike model  -->
-            <!-- <span class="inline-flex items-center gap-1.5">
-              <ng-icon name="lucideBike" class="size-3.5" aria-hidden="true" />
-              {{ route.bike }}
-            </span> -->
           </div>
 
           <div class="flex shrink-0 items-center gap-2">
@@ -106,6 +92,12 @@
             >
               <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
               .GPX
+            </button>
+
+            <button hlmBtn variant="destructive"
+              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]">
+              Descartar ruta
+              <ng-icon name="lucideNavigationOff" class="size-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -124,18 +116,17 @@
         </p>
 
         <dl class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
-          <!-- FIXME: Asignar las metricas en un array de objeto -->
-          <!-- @for (metric of route.metrics; track metric.label) {
-            <div class="flex flex-col gap-1">
-              <dt class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                {{ metric.label }}
-              </dt>
-              <dd class="text-sm font-semibold text-foreground">{{ metric.value }}</dd>
-            </div>
-          } -->
+          <div class="flex flex-col gap-1">
+            <dt class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              Distancia
+            </dt>
+            <dd class="text-sm font-semibold text-foreground">{{ route.distance_km }} km</dd>
+          </div>
         </dl>
+        
+        <!-- Ruta de mapa -->
+        <app-route-map [route]="formatCoords(route.coords)" [markers]="[]" [height]="'400px'" />
 
-        <!-- TODO: Agregar componete de mapa. -->
         <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span class="font-mono text-[10px] uppercase tracking-[0.14em]">Hitos:</span>
           <span class="text-[11px] leading-relaxed">{{ route.waypoints }}</span>

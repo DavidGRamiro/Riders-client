@@ -14,7 +14,7 @@ export interface RouteAiResponse {
   route_code: string;
 }
 
-interface AiCoords {
+export interface AiCoords {
   lat: number;
   lon: number;
 }

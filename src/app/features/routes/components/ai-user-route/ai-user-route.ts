@@ -12,55 +12,25 @@ import { RouteService } from '../../services/route-service';
 import { firstValueFrom } from 'rxjs';
 import { toast } from '@spartan-ng/brain/sonner';
 import { RouteAiResponse } from '../../interfaces/route-ai.interface';
+import type { LatLngTuple } from 'leaflet';
 import { DatePipe } from '@angular/common';
+import { RouteMap } from '../ai-route-details/route-map/route-map';
+import { lucideDelete } from "@ng-icons/lucide";
+import { HlmButtonImports } from "@spartan-ng/helm/button";
+import { lucideNavigationOff } from "@ng-icons/lucide";
 
-type RouteSize = 'wide' | 'compact';
+
 type AsphaltFilter = 'all' | 'asphalt' | 'mixed';
 type SortOrder = 'recent' | 'oldest' | 'distance';
 
-interface WideSavedRoute {
-  size: 'wide';
-  id: string;
-  code: string;
-  createdAt: string;
-  bike: string;
-  highlight?: string;
-  title: string;
-  summary: string;
-  metrics: { label: string; value: string }[];
-  profile: string;
-  waypoints: string;
-  distanceKm: number;
-  asphalt: Exclude<AsphaltFilter, 'all'>;
-  hasGpx: boolean;
-  tags: string[];
-}
-
-interface CompactSavedRoute {
-  size: 'compact';
-  id: string;
-  createdAt: string;
-  badge: { label: string; class: string };
-  title: string;
-  summary: string;
-  distance: string;
-  time: string;
-  extra: string;
-  distanceKm: number;
-  asphalt: Exclude<AsphaltFilter, 'all'>;
-  hasGpx: boolean;
-  tags: string[];
-}
-
-type SavedRoute = WideSavedRoute | CompactSavedRoute;
 
 /** Historial de rutas generadas por el usuario con buscador, filtros y paginación. */
 @Component({
   selector: 'app-ai-user-route',
-  imports: [NgIcon, HlmNativeSelectImports, HlmSwitchImports, DatePipe],
+  imports: [NgIcon, HlmNativeSelectImports, HlmSwitchImports, DatePipe, HlmButtonImports, RouteMap],
   templateUrl: './ai-user-route.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideIcons({ lucideBike, lucideDownload, lucideSearch, lucideZap })],
+  providers: [provideIcons({ lucideBike, lucideDownload, lucideSearch, lucideZap, lucideDelete, lucideNavigationOff })],
 })
 export class AiUserRoute implements OnInit {
   /** Total de rutas guardadas en el historial. */
@@ -78,6 +48,7 @@ export class AiUserRoute implements OnInit {
   protected readonly onlyGpx = signal(false);
   /** Página actual del historial. */
   protected readonly page = signal(1);
+  /** Carga de rutas generadas por el usuario */
   public userRoutes = signal<RouteAiResponse[]>([])
 
   private _routeService = inject(RouteService)
@@ -95,4 +66,8 @@ export class AiUserRoute implements OnInit {
       toast.error("No se han podido recuperar las rutas generadoas por la IA.")
     }
   }
+
+  public formatCoords(coords: RouteAiResponse['coords']): LatLngTuple[] {
+    return coords.map(({ lat, lon }) => [lat, lon]);
+  } 
 }
