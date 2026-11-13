@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouteTitle } from './route-title/route-title';
 import { RouteMap, RouteMapMarker } from './route-map/route-map';
 import { RouteAnalytics } from './route-analytics/route-analytics';
@@ -38,14 +38,13 @@ export class AiRouteDetails{
 
   /** Distancia estimada en kilómetros, o 0 si no está definida. */
   public readonly distance = computed(() => {
-    const distance = this._routeStore.ollama().distance_estimated_km;
+    const distance = this._routeStore.route_engine().distance;
     if(distance > 0){
       return distance
     }
     return 0
   })
 
-  /** FIXME:  Tiempo estimado de la ruta (pendiente de convertir los segundos a minutos / horas). */
   public time_estimated = computed(() => this._routeStore.route_engine().duration)
 
   /** Puntos de la ruta obtenidos de las coordenadas generadas por la IA. */
@@ -59,19 +58,14 @@ export class AiRouteDetails{
   );
 
   /** Marcadores de la ruta generada a partir de sus coordenadas. */
-  //  public markers = computed<RouteMapMarker[]>(() => {
-  //   const coords = this._routeStore.ollama().way_points ?? [];
+   public markers = computed<RouteMapMarker[]>(() => {
+    const way_points_coords = this._routeStore.ollama().way_points_coords
 
-  //   return coords
-  //     .filter(
-  //       (item): item is GeoResponse & { lat: number; lon: number } =>
-  //         typeof item.lat === 'number' && typeof item.lon === 'number',
-  //     )
-  //     .map((item) => ({
-  //         label: item.location,
-  //       position: [item.lat, item.lon],
-  //     }));
-  // });
+    return way_points_coords.map((coords) => ({
+      label: coords.name,
+      position: [coords.lat, coords.lon]
+    }))
+  });
 
   /** Título del mapa con el origen y el destino. */
   public titleMap = computed<string>(() => {

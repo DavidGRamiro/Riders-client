@@ -67,8 +67,7 @@ export class RouteAnalytics {
   protected readonly wayPoints = computed(() => this._routeStore.ollama().way_points);
 
   /** Distancia estimada en kilómetros. */
-  protected readonly distance = computed(() => this._routeStore.ollama().distance_estimated_km);
-
+  protected readonly distance = computed(() => this._routeStore.route_engine().distance);
   /** Número de coordenadas GPS que forman el trazado. */
   protected readonly gpsPoints = computed(() => this._routeStore.ollama().way_points.length);
 

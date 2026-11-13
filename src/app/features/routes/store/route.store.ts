@@ -12,6 +12,7 @@ const initialState : RouteResponse = {
     route_type: '',
     title: '',
     way_points: [],
+    way_points_coords: [],
   },
   route_engine: {
     distance: 0,
