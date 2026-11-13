@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  output,
   signal,
 } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
@@ -59,6 +60,9 @@ const DEFAULT_DISTANCE_KM = 150;
   providers: [provideIcons({ lucideCheck, lucideDownload, lucideRotateCcw })],
 })
 export class AiRoute {
+  /** Emitir señal cuando se genera una nueva ruta. */
+  public eventResRoute = output<boolean>();
+
   private _ollama = inject(Ollama);
   private _routeStore = inject(RouteStore);
 
@@ -94,6 +98,7 @@ export class AiRoute {
   protected readonly preferCurvyRoads = signal(false);
   /** Indica si hay una petición de generación en curso. */
   public loading = signal<boolean>(false);
+  public newRoute = signal<boolean>(false); 
 
   /** Formulario con validaciones y envío a la API de generación de rutas. */
   public aiRouteForm = form(
@@ -114,6 +119,7 @@ export class AiRoute {
         action: async (field) => {
           try {
             this.loading.set(true);
+            this.newRoute.set(false);
 
             const body: AiGenerator = {
               additional_message: field().value().additional_message,
@@ -130,17 +136,19 @@ export class AiRoute {
               this._ollama.generateRoute(body),
             );
             this.loading.set(false);
-            console.log('Respuesta',response);
+            this.newRoute.set(true);
             this._routeStore.setRoute(response);
             toast.success("Ruta generada correctamente");
           } catch (err: unknown) {
             this.loading.set(false);
+            this.newRoute.set(false);
             const { error } = err as HttpErrorResponse;
             toast.error(
               error.detail ??
                 "Ha ocurrido un error al crear la ruta. Intenéntalo de nuevo más tarde.",
             );
           }
+          this.eventResRoute.emit(this.newRoute());
         },
       },
     },
