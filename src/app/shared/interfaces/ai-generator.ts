@@ -18,6 +18,7 @@ export interface OllamaResponse {
   route_type: string;
   title: string;
   way_points: string[];
+  way_points_coords: any[];
 }
 
 export interface RouteResponse {
