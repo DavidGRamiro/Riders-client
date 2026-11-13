@@ -141,11 +141,11 @@
         </dl>
         
         <!-- Ruta de mapa -->
-        <app-route-map [route]="formatCoords(route.coords)" [markers]="formatMarkers(route.way_points_coords)" [height]="'400px'"/>
+        <app-route-map [route]="formatCoords(route.coords)" [markers]="formatMarkers(route.way_points_coords)" [height]="'400px'" [title]="getTitle(route.waypoints)"/>
 
         <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span class="font-mono text-[10px] uppercase tracking-[0.14em]">Hitos:</span>
-          <span class="text-[11px] leading-relaxed">{{ route.waypoints }}</span>
+          <span class="text-[11px] leading-relaxed">{{ formatTextWaypoints(route.waypoints) }}</span>
         </p>
       </article>
     } 

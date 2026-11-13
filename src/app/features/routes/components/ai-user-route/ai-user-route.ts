@@ -123,4 +123,19 @@ export class AiUserRoute implements OnInit {
   public getTotalTime( duration: number){
     return formatTime(duration)
   }
+
+  public getTitle(waypoints : string[]){
+    if(waypoints.length > 0){
+      return waypoints[0] + ' - ' + waypoints[waypoints.length - 1]
+    }
+    return 'Ruta generada por Inteligencia Artifical'
+  }
+
+  public formatTextWaypoints(waypoints : string[]){
+    const pointsOfRoutes = waypoints;
+    if(pointsOfRoutes.length > 0){
+      return pointsOfRoutes.join(' → ');
+    }
+    return 'Lugares de interés en ruta.';
+  }
 }
