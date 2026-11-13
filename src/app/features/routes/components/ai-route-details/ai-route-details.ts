@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouteTitle } from './route-title/route-title';
 import { RouteMap, RouteMapMarker } from './route-map/route-map';
 import { RouteAnalytics } from './route-analytics/route-analytics';

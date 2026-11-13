@@ -17,7 +17,6 @@
         [value]="searchTerm()"
         class="h-11 w-full rounded-md border border-border/60 bg-white/[0.02] pl-10 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       />
-        <!-- /* (input)="updateSearch($event)" */ -->
       <kbd
         class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-border/60 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground"
       >
@@ -32,7 +31,6 @@
         [value]="asphaltFilter()"
         selectClass="h-11 min-w-44 border-border/60 bg-white/[0.02] text-sm text-muted-foreground"
       >
-        <!-- /* (valueChange)="updateAsphalt($event)" */ -->
         <option hlmNativeSelectOption value="all">Todos los asfaltos</option>
         <option hlmNativeSelectOption value="asphalt">Solo asfalto</option>
         <option hlmNativeSelectOption value="mixed">Mixto / Trail</option>
@@ -90,8 +88,14 @@
               type="button"
               class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
             >
-              <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
               .GPX
+              <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
+            </button>
+
+            <button hlmBtn size="sm"
+              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium">
+              Guardar ruta
+              <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
             </button>
 
             <button hlmBtn variant="destructive"
@@ -118,14 +122,26 @@
         <dl class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
           <div class="flex flex-col gap-1">
             <dt class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-              Distancia
+              Distancia estimada
             </dt>
-            <dd class="text-sm font-semibold text-foreground">{{ route.distance_km }} km</dd>
+            <dd class="text-sm font-semibold text-foreground">{{ route.distance_km.toFixed(0) }} Kilómetros</dd>
           </div>
+          <div class="flex flex-col gap-1">
+            <dt class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              Duración estimada
+            </dt>
+            <dd class="text-sm font-semibold text-foreground">{{ getTotalTime(route.duration) }}</dd>
+          </div>
+            <div class="flex flex-col gap-1">
+              <dt class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                Tipo de ruta
+              </dt>
+              <dd class="text-sm font-semibold text-foreground">{{ getTypeOfRoute(route.route_type) }}</dd>
+            </div>
         </dl>
         
         <!-- Ruta de mapa -->
-        <app-route-map [route]="formatCoords(route.coords)" [markers]="[]" [height]="'400px'" />
+        <app-route-map [route]="formatCoords(route.coords)" [markers]="formatMarkers(route.way_points_coords)" [height]="'400px'"/>
 
         <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span class="font-mono text-[10px] uppercase tracking-[0.14em]">Hitos:</span>

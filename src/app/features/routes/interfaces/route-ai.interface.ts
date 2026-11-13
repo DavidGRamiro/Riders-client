@@ -12,6 +12,8 @@ export interface RouteAiResponse {
   title: string;
   prompt: string;
   route_code: string;
+  way_points_coords: [],
+  duration: number;
 }
 
 export interface AiCoords {
