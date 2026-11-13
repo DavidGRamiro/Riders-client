@@ -3,6 +3,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmCardImports } from "@spartan-ng/helm/card";
 import { HlmButtonImports } from "@spartan-ng/helm/button";
 import { lucideSignpost } from '@ng-icons/lucide';
+import { formatTime } from '../../../../../shared/utils';
 
 @Component({
   selector: 'app-route-title',
@@ -22,6 +23,15 @@ export class RouteTitle {
   public distance = input.required<number>()
   /** Tiempo estimado de la ruta. */
   public time = input.required<number>()
+
+  /** Formateo del tipo de milisegundos a hh/mm */
+  public getTime(time: number){
+    if(time > 0){
+      return formatTime(time)
+    }else{
+      return '0 h'
+    }
+  }
 
 
 }

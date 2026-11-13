@@ -23,14 +23,14 @@
             Distancia
           </span>
           <span class="text-lg font-semibold leading-none text-foreground">
-            {{ distance() }}<span class="text-xs font-medium text-muted-foreground ml-1">km</span>
+            {{ distance().toFixed(0) }}<span class="text-xs font-medium text-muted-foreground ml-1">km</span>
           </span>
         </div>
         <div class="flex flex-col gap-1 rounded-md border border-border/60 bg-white/[0.02] px-3.5 py-2">
           <span class="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
             Tiempo
           </span>
-          <span class="text-lg font-semibold leading-none text-foreground">{{ time() }} h</span>
+          <span class="text-lg font-semibold leading-none text-foreground">{{ getTime(time())}} </span>
         </div>
       </div>
     </div>
