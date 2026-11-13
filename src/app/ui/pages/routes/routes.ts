@@ -32,8 +32,16 @@ export class Routes {
   ] as const;
 
   protected readonly activeTab = signal<string>('assisted');
+  protected  eventNewRoute = signal<boolean>(false)
   
   protected selectTab(tabId: string): void {
     this.activeTab.set(tabId);
+    if (tabId === 'history') {
+      this.eventNewRoute.set(false);
+    }
+  }
+
+  public getEmitterNewRoute( event: boolean){
+    this.eventNewRoute.set(event)
   }
 }

@@ -73,19 +73,21 @@
         [attr.aria-selected]="activeTab() === tab.id"
         [class]="
           activeTab() === tab.id
-            ? 'inline-flex h-10 items-center gap-2 rounded-md border border-border/70 bg-white/[0.08] px-3.5 text-sm font-medium text-foreground'
-            : 'inline-flex h-10 items-center gap-2 rounded-md border border-transparent px-3.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground'
+            ? 'relative inline-flex h-10 items-center gap-2 rounded-md border border-border/70 bg-white/[0.08] px-3.5 text-sm font-medium text-foreground'
+            : 'relative inline-flex h-10 items-center gap-2 rounded-md border border-transparent px-3.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground'
         "
         (click)="selectTab(tab.id)"
       >
         <ng-icon [name]="tab.icon" class="size-4" aria-hidden="true" />
         {{ tab.label }}
-        @if (tab.count) {
-          <span
-            class="rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-muted-foreground"
-          >
-            {{ tab.count }}
+        @if (eventNewRoute() && tab.id === 'history') {
+          <span class="absolute -top-1 -right-1 flex size-2" aria-hidden="true">
+            <span
+              class="absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping motion-reduce:animate-none"
+            ></span>
+            <span class="relative inline-flex size-2 rounded-full bg-emerald-400 ring-2 ring-background"></span>
           </span>
+          <span class="sr-only">Hay nuevas rutas disponibles</span>
         }
       </button>
     }
@@ -95,12 +97,12 @@
     class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,0.71fr)_minmax(0,1fr)]">
     @switch (this.activeTab()) {
       @case ('assisted') {
-        <app-ai-route />
+        <app-ai-route (eventResRoute)="getEmitterNewRoute($event)"/>
         <app-ai-route-details />
       }
       @default {
         <div class="min-w-0 xl:col-span-2">
-          <app-ai-user-route />
+          <app-ai-user-route [newRoute]="eventNewRoute()" />
         </div>
       }
     }
