@@ -47,18 +47,28 @@ export class AiUserRoute implements OnInit{
   public userRoutes = signal<RouteAiResponse[]>([])
 
   // Paginacion
+  /** Página actual de resultados. */
   public readonly page = signal(1);
+	/** Cantidad de resultados por página. */
 	public readonly pageSize = signal(5);
+	/** Total de rutas disponibles. */
 	public readonly totalItems = signal(0);
 
   //Filtros
+  /** Texto actual de búsqueda. */
   private textSearch = signal<string>('')
+  /** Stream de búsqueda con debounce. */
   private searchSubject = new Subject<string>();
+  /** Stream de cambios de orden. */
   private orderSubject = new Subject<string>();
+  /** Stream para forzar el refresco del listado. */
+  private refreshSubject = new Subject<void>();
 
   // Services
+  /** Servicio de rutas generadas por IA. */
   private _routeService = inject(RouteService)
 
+  /** Sincroniza la carga de rutas al crear una nueva o cambiar de página. */
   constructor(){
     effect(() => {
       if(this.newRoute() || this.page()){
@@ -67,6 +77,7 @@ export class AiUserRoute implements OnInit{
     })
   }
 
+  /** Inicializa los streams de búsqueda, orden y refresco de rutas. */
   ngOnInit(): void {
     this.searchSubject
       .pipe(
@@ -77,6 +88,9 @@ export class AiUserRoute implements OnInit{
           this.orderSubject.pipe(
             startWith('-id'),
             distinctUntilChanged()
+          ),
+          this.refreshSubject.pipe(
+            startWith(undefined)
           )
         ),
         switchMap(([search, order]) => this.getRoutesAiUser(search, order).pipe(catchError(
@@ -100,10 +114,12 @@ export class AiUserRoute implements OnInit{
     return this._routeService.getRoutesAiUser(params)
   }
 
+  /** Convierte las coordenadas de la API en tuplas LatLng para Leaflet. */
   public formatCoords(coords: RouteAiResponse['coords']): LatLngTuple[] {
     return coords.map(({ lat, lon }) => [lat, lon]);
   } 
 
+  /** Devuelve la etiqueta legible del tipo de ruta. */
   public getTypeOfRoute( route_type : string) : string{
     
     let type_text = ''
@@ -124,6 +140,7 @@ export class AiUserRoute implements OnInit{
     return type_text
   }
 
+  /** Construye los marcadores del mapa a partir de las coordenadas. */
   public formatMarkers(coords : [] | {}) : RouteMapMarker[]{
     let markers : RouteMapMarker[] = []
     
@@ -138,10 +155,12 @@ export class AiUserRoute implements OnInit{
     return markers
   }
 
+  /** Formatea la duración total de la ruta. */
   public getTotalTime( duration: number){
     return formatTime(duration)
   }
 
+  /** Devuelve un título basado en el primer y último waypoint. */
   public getTitle(waypoints : string[]){
     if(waypoints.length > 0){
       return waypoints[0] + ' - ' + waypoints[waypoints.length - 1]
@@ -149,6 +168,7 @@ export class AiUserRoute implements OnInit{
     return 'Ruta generada por Inteligencia Artifical'
   }
 
+  /** Une los waypoints en una cadena separada por flechas. */
   public formatTextWaypoints(waypoints : string[]){
     const pointsOfRoutes = waypoints;
     if(pointsOfRoutes.length > 0){
@@ -157,13 +177,26 @@ export class AiUserRoute implements OnInit{
     return 'Lugares de interés en ruta.';
   }
 
+  /** Emite el texto introducido en el buscador. */
   public onSearchChange(event:Event){
     const text = (event.target as HTMLInputElement).value
     this.searchSubject.next(text)
   }
 
+  /** Actualiza el orden de los resultados seleccionado. */
   public updateSortOrder(event:any){
-    const value = event === 'oldest' ? 'id' : '-id'
+    const value = event === 'id' ? 'id' : '-id'
     this.orderSubject.next(value)
+  }
+
+  /** Elimina una ruta generada y refresca el listado. */
+  public async onDeleteRoute(id:number){
+    try {
+      await firstValueFrom(this._routeService.deleteRoute(id))
+      toast.success('Ruta eliminada correctamente.')
+      this.refreshSubject.next()
+    } catch (error) {
+      toast.error('No se ha podido eliminar la ruta, intentelo mas tarde.')
+    }
   }
 }

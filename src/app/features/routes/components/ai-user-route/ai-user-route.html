@@ -49,20 +49,21 @@
           <div class="flex shrink-0 items-center gap-2">
             <button
               type="button"
-              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
+              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06] cursor-pointer"
             >
               .GPX
               <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
             </button>
 
             <button hlmBtn size="sm"
-              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium">
+              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium cursor-pointer">
               Guardar ruta
               <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
             </button>
 
             <button hlmBtn variant="destructive"
-              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]">
+              (click)="onDeleteRoute(route.id)"
+              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06] cursor-pointer">
               Descartar ruta
               <ng-icon name="lucideNavigationOff" class="size-4" aria-hidden="true" />
             </button>
