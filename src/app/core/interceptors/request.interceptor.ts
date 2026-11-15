@@ -13,6 +13,7 @@ export function requestInterceptor(
   const _authStore = inject(AuthStore);
   const token = _authStore.accessToken();
   
+  const isExternalURL = req.url.includes('https');
   const isPublicUrl = req.url.includes('login') || req.url.includes('refresh');
   const isNewUser = req.url.includes('/user') && req.method === 'POST';
   const BASE_URL = `${env.URL_BACKEND}${env.PREFIX}${req.url}` 
@@ -21,7 +22,10 @@ export function requestInterceptor(
 
   if(isPublicUrl || isNewUser){
     request = req.clone({ url: BASE_URL })
-  }else{
+  }else if (isExternalURL){
+    return next(request)
+  }
+  else{
     request = req.clone({
       url: BASE_URL,
       setHeaders : {
