@@ -2,13 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnInit,
   output,
   signal,
 } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import {
   form,
-  min,
   required,
   FormRoot,
   FormField,
@@ -26,13 +26,17 @@ import { HlmSwitchImports } from "@spartan-ng/helm/switch";
 import { HlmTextarea } from "@spartan-ng/helm/textarea";
 import { toast } from "@spartan-ng/brain/sonner";
 import { Ollama } from "../../../../shared/services/ollama";
-import {
-  AiGenerator,
-  AiRouteFormModel,
-  RouteResponse,
-} from "../../../../shared/interfaces/ai-generator";
-import { NullableTextInput } from "../../../../shared/directives/nullable-text-input";
+import { AiRouteFormModel, RouteResponse } from "../../../../shared/interfaces/ai-generator";
 import { RouteStore } from "../../store/route.store";
+import { lucideGlobe } from "@ng-icons/lucide";
+import { HlmComboboxImports } from "@spartan-ng/helm/combobox";
+import { HlmInputGroupAddon } from "@spartan-ng/helm/input-group";
+import { GobService } from "../../services/gob-service";
+import {
+  Municipality,
+  Provinces,
+} from "../../interfaces/provinvces-interface";
+
 
 /** Distancia estimada por defecto en kilómetros. */
 const DEFAULT_DISTANCE_KM = 150;
@@ -47,58 +51,98 @@ const DEFAULT_DISTANCE_KM = 150;
     HlmTextarea,
     HlmInputImports,
     HlmField,
-    HlmFieldDescription,
     FormRoot,
     FormField,
     HlmSpinnerImports,
     HlmButtonImports,
-    NullableTextInput,
     HlmCardImports,
+    HlmComboboxImports,
+    HlmInputGroupAddon
   ],
   templateUrl: "./ai-route.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideIcons({ lucideCheck, lucideDownload, lucideRotateCcw })],
+  providers: [provideIcons({ lucideCheck, lucideDownload, lucideRotateCcw, lucideGlobe })],
 })
-export class AiRoute {
+export class AiRoute implements OnInit {
+
   /** Emitir señal cuando se genera una nueva ruta. */
   public eventResRoute = output<boolean>();
 
+  /** Services */
   private _ollama = inject(Ollama);
   private _routeStore = inject(RouteStore);
+  private _gobService = inject(GobService);
 
   /** Modelo inicial vacío del formulario. */
   private readonly initialModel: AiRouteFormModel = {
     additional_message: "",
     route_type: null,
-    distance_km: null,
-    avoid_motorways: false,
-    prefer_curvy_roads: false,
+    avoid_motorways: true,
+    prefer_curvy_roads: true,
     origin: "",
     destination: null,
-    duration_time: null,
   };
-
+  /** Presets de estilo de ruta disponibles. */
+  protected readonly presets = ["Relajada","Panorámica Vistas","Rápida & Fluida","Circular"];
+  /** Preset de ruta seleccionado actualmente. */
+  protected readonly selectedPreset = signal(this.presets[0]);
+  /** Indica si se deben evitar las autopistas. */
+  protected readonly avoidMotorways = signal(true);
+  /** Datos de provincias obtenidos de la API. */
+  protected readonly provinces = signal<Provinces[]>([]);
+  /** Indica si hay una petición de generación en curso. */
+  public loading = signal<boolean>(false);
+  /** Indica si se ha generado una nueva ruta. */
+  public newRoute = signal<boolean>(false); 
   /** Estado reactivo del formulario. */
   private aiRouteModel = signal<AiRouteFormModel>({ ...this.initialModel });
 
-  /** Presets de estilo de ruta disponibles. */
-  protected readonly presets = [
-    "Relajada",
-    "Panorámica Vistas",
-    "Rápida & Fluida",
-    "Circular",
-  ];
-  /** Preset de ruta seleccionado actualmente. */
-  protected readonly selectedPreset = signal(this.presets[0]);
-  /** Distancia estimada en kilómetros. */
-  protected readonly estimatedDistance = signal(DEFAULT_DISTANCE_KM);
-  /** Indica si se deben evitar las autopistas. */
-  protected readonly avoidMotorways = signal(false);
-  /** Indica si se prefieren carreteras con curvas. */
-  protected readonly preferCurvyRoads = signal(false);
-  /** Indica si hay una petición de generación en curso. */
-  public loading = signal<boolean>(false);
-  public newRoute = signal<boolean>(false); 
+  async ngOnInit(): Promise<void> {
+    this.loadProvincesData()
+  }
+
+  /** Carga todas las provincias y sus municipios. */
+  private async loadProvincesData(): Promise<void> {
+    const { data: provinces = [] } = await firstValueFrom(
+      this._gobService.getProvinces(),
+    );
+
+    const withMunicipalities = await Promise.all(
+      provinces.map(async ({ id, comunidad_id, nombre }) => ({
+        id,
+        comunidad_id,
+        nombre,
+        municipios: await this.fetchAllMunicipalities(id),
+      })),
+    );
+
+    this.provinces.set(withMunicipalities);
+  }
+
+  /** Obtiene todos los municipios de una provincia. */
+  private async fetchAllMunicipalities(
+    provinciaId: number,
+  ): Promise<Municipality[]> {
+    const first = await firstValueFrom(
+      this._gobService.getMunicipalities(provinciaId),
+    );
+
+    const { data = [], total = data.length, limit = 100 } = first;
+    const pendingPages = Math.max(0, Math.ceil(total / limit) - 1);
+    if (pendingPages === 0) {
+      return data;
+    }
+
+    const pages = await Promise.all(
+      Array.from({ length: pendingPages }, (_, index) =>
+        firstValueFrom(
+          this._gobService.getMunicipalities(provinciaId, (index + 1) * limit, limit),
+        ),
+      ),
+    );
+
+    return [...data, ...pages.flatMap((page) => page.data)];
+  }
 
   /** Formulario con validaciones y envío a la API de generación de rutas. */
   public aiRouteForm = form(
@@ -110,8 +154,8 @@ export class AiRoute {
       required(schema.origin, {
         message: "El punto de partida es obligatorio",
       });
-      min(schema.duration_time, 0, {
-        message: "La duración no puede ser negativa",
+      required(schema.destination, {
+        message: "El punto de partida es obligatorio",
       });
     },
     {
@@ -120,16 +164,12 @@ export class AiRoute {
           try {
             this.loading.set(true);
             this.newRoute.set(false);
-
-            const body: AiGenerator = {
+            const body = {
               additional_message: field().value().additional_message,
               route_type: this.getRouteType(),
-              distance_km: this.estimatedDistance(),
               avoid_motorways: this.avoidMotorways(),
-              prefer_curvy_roads: this.preferCurvyRoads(),
               origin: field().value().origin,
               destination: field().value().destination,
-              duration_time: field().value().duration_time ?? null,
             };
 
             const response: RouteResponse = await firstValueFrom(
@@ -159,11 +199,6 @@ export class AiRoute {
     this.selectedPreset.set(preset);
   }
 
-  /** Actualiza la distancia estimada a partir del valor del slider. */
-  protected updateEstimatedDistance(values: number[]): void {
-    this.estimatedDistance.set(values[0] ?? this.estimatedDistance());
-  }
-
   /** Traduce el preset seleccionado al tipo de ruta esperado por la API. */
   protected getRouteType() {
     switch (this.selectedPreset()) {
@@ -185,9 +220,7 @@ export class AiRoute {
     this.aiRouteModel.set({ ...this.initialModel });
     this.aiRouteForm().reset();
     this.selectedPreset.set(this.presets[0]);
-    this.estimatedDistance.set(DEFAULT_DISTANCE_KM);
     this.avoidMotorways.set(false);
-    this.preferCurvyRoads.set(false);
     this.loading.set(false);
   }
 }
