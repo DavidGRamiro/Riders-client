@@ -10,8 +10,8 @@
       <input
         id="ai-user-route-search"
         type="search"
-        placeholder="Buscar por puerto, comarca o prompt..."
-        [value]="searchTerm()"
+        placeholder="Buscar por provincia, municipio o prompt..."
+        (input)="onSearchChange($event)"
         class="h-11 w-full rounded-md border border-border/60 bg-white/[0.02] pl-10 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       />
       <kbd class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-border/60 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground">⌘K</kbd>
@@ -23,11 +23,10 @@
         selectId="ai-user-route-sort"
         [value]="sortOrder()"
         selectClass="h-11 min-w-40 border-border/60 bg-white/[0.02] text-sm text-muted-foreground"
+        (valueChange)="updateSortOrder($event)"
       >
-        <!-- /* (valueChange)="updateSortOrder($event)" */ -->
-        <option hlmNativeSelectOption value="recent">Más recientes</option>
-        <option hlmNativeSelectOption value="oldest">Más antiguas</option>
-        <option hlmNativeSelectOption value="distance">Mayor distancia</option>
+        <option hlmNativeSelectOption value="-id">Más recientes</option>
+        <option hlmNativeSelectOption value="id">Más antiguas</option>
       </hlm-native-select>
     </div>
   </div>
