@@ -35,6 +35,7 @@ import { UserStore } from "../../../../shared";
 import { HttpErrorResponse } from "@angular/common/http";
 import { toast } from "@spartan-ng/brain/sonner";
 import { Router } from "@angular/router";
+import { Confeti } from "../../services/confeti";
 
 
 @Component({
@@ -82,6 +83,7 @@ export class Signup {
   private _authStore = inject(AuthStore);
   private _userStore = inject(UserStore);
   private _router = inject(Router);
+  private _confeti = inject(Confeti)
 
   // FIXME: Temporal data until the issue #8 is resolved
   public typesOfBikes = [
@@ -123,7 +125,7 @@ export class Signup {
             const { token, refresh, user, is_online } = await firstValueFrom(this._auth.register(field().value()));
             this._authStore.setTokens(token, refresh);
             this._userStore.setUser( { username: user, is_online, authenticated: true });
-
+            this._confeti.show()
             localStorage.setItem('refresh', refresh)
             this._router.navigate(['/home']);
           } catch (err: unknown) {

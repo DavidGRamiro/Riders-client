@@ -15,7 +15,7 @@ export function requestInterceptor(
   
   const isExternalURL = req.url.includes('https');
   const isPublicUrl = req.url.includes('login') || req.url.includes('refresh');
-  const isNewUser = req.url.includes('/user') && req.method === 'POST';
+  const isNewUser = req.url === 'user/' && req.method === 'POST';
   const BASE_URL = `${env.URL_BACKEND}${env.PREFIX}${req.url}` 
   
   let request = req;

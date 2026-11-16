@@ -36,6 +36,7 @@ import {
   Municipality,
   Provinces,
 } from "../../interfaces/provinvces-interface";
+import { Confeti } from "../../../auth/services/confeti";
 
 
 /** Distancia estimada por defecto en kilómetros. */
@@ -72,6 +73,7 @@ export class AiRoute implements OnInit {
   private _ollama = inject(Ollama);
   private _routeStore = inject(RouteStore);
   private _gobService = inject(GobService);
+  private _confeti = inject(Confeti)
 
   /** Modelo inicial vacío del formulario. */
   private readonly initialModel: AiRouteFormModel = {
@@ -178,7 +180,9 @@ export class AiRoute implements OnInit {
             this.loading.set(false);
             this.newRoute.set(true);
             this._routeStore.setRoute(response);
-            toast.success("Ruta generada correctamente");
+            
+            this._confeti.show()
+            toast.success("Ruta generada correctamente",{ position: 'top-center'});
           } catch (err: unknown) {
             this.loading.set(false);
             this.newRoute.set(false);
