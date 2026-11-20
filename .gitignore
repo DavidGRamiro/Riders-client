@@ -46,3 +46,7 @@ Thumbs.db
 /src/environments
 
 .DS_Store
+
+.claude
+opencode.json
+skills-lock.json
