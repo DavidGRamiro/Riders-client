@@ -14,6 +14,8 @@ import {
   lucideShare2,
 } from '@ng-icons/lucide';
 import { RouteStore } from '../../../store/route.store';
+import { RouteService } from '../../../services/route-service';
+import { firstValueFrom } from 'rxjs';
 
 /** Etiquetas legibles para los tipos de ruta que devuelve la API. */
 const ROUTE_TYPE_LABELS: Record<string, string> = {
@@ -49,6 +51,7 @@ const ROUTE_TYPE_LABELS: Record<string, string> = {
 })
 export class RouteAnalytics {
   private readonly _routeStore = inject(RouteStore);
+  private _aiRouteService = inject(RouteService)
 
   /** Indica si existe una ruta generada con coordenadas utilizables. */
   protected readonly hasRoute = computed(() => this._routeStore.route_engine().coordinates.length > 0);
@@ -80,13 +83,16 @@ export class RouteAnalytics {
   protected readonly prefersCurves = computed(() => this._routeStore.ollama().prefer_curvy_roads);
 
   /** Guarda la ruta generada en el garaje del usuario. */
-  protected saveRoute(): void {
+  protected async saveRoute(): Promise<void> {
+    const idRoute = this._routeStore.getRoute().route.id
     if (!this.hasRoute()) {
       return;
     }
-
-    // TODO: Conectar con el endpoint de guardado cuando esté disponible.
-    toast.success('Ruta guardada en tu garaje');
+    const body = { saved : true }
+    const result =  await firstValueFrom(this._aiRouteService.saveAiRoute(idRoute, body))
+    console.log(result);
+    
+    this._routeStore.updateSavedRoute(this._routeStore.getRoute().route.saved)
   }
 
   /** Comparte un resumen de la ruta o lo copia al portapapeles como alternativa. */

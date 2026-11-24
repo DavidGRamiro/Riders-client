@@ -100,6 +100,8 @@ export class AiUserRoute implements OnInit{
           }
          ))  )
       ).subscribe(( response : any ) => {
+        console.log(response);
+        
         this.userRoutes.set(response.results);
         this.totalItems.set(response.count);
       });

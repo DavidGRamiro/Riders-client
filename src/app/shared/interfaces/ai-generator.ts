@@ -15,6 +15,7 @@ export interface OllamaResponse {
 export interface RouteResponse {
   ollama: OllamaResponse;
   route_engine : RouteEngineResponse;
+  route: RouteAIUser
 }
 
 export interface RouteEngineResponse {
@@ -35,4 +36,9 @@ export interface AiRouteFormModel {
   prefer_curvy_roads: boolean;
   origin: string;
   destination: string | null;
+}
+
+export interface RouteAIUser{
+  id: number,
+  saved: boolean
 }

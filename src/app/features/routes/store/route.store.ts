@@ -18,6 +18,10 @@ const initialState : RouteResponse = {
     distance: 0,
     duration: 0,
     coordinates: [],
+  },
+  route:{
+    id: 0,
+    saved: false,
   }
 }
 
@@ -35,6 +39,11 @@ export const RouteStore = signalStore(
     //Clear to initialState de routes state
     clearRoute(){
       patchState(store, initialState)
+    },
+
+    // Update la variable saved de route
+    updateSavedRoute(saved: boolean){
+      patchState(store, { route: { id: store.route().id, saved } })
     },
 
     // Get all Route data
