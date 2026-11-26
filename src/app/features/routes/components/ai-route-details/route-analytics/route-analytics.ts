@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
@@ -12,6 +12,7 @@ import {
   lucideMapPin,
   lucideRoute,
   lucideShare2,
+  lucideSaveOff
 } from '@ng-icons/lucide';
 import { RouteStore } from '../../../store/route.store';
 import { RouteService } from '../../../services/route-service';
@@ -46,6 +47,7 @@ const ROUTE_TYPE_LABELS: Record<string, string> = {
       lucideMapPin,
       lucideRoute,
       lucideShare2,
+      lucideSaveOff
     }),
   ],
 })
@@ -66,6 +68,10 @@ export class RouteAnalytics {
     () => this._routeStore.ollama().destination.trim() || 'Destino sin definir',
   );
 
+  /** Control de si la ruta generada ha sido guardada por el usuario o no */
+  protected hasSavedRoute = signal<boolean>(false)
+
+
   /** Puntos de paso intermedios. */
   protected readonly wayPoints = computed(() => this._routeStore.ollama().way_points);
 
@@ -83,24 +89,24 @@ export class RouteAnalytics {
   protected readonly prefersCurves = computed(() => this._routeStore.ollama().prefer_curvy_roads);
 
   /** Guarda la ruta generada en el garaje del usuario. */
-  protected async saveRoute(): Promise<void> {
-    const idRoute = this._routeStore.getRoute().route.id
-    if (!this.hasRoute()) {
-      return;
-    }
-    const body = { saved : true }
-    const result =  await firstValueFrom(this._aiRouteService.saveAiRoute(idRoute, body))
-    console.log(result);
+  protected async saveRoute(saved: boolean): Promise<void> {
+    const idRoute = this._routeStore.getRoute().route.id;
+    if (!this.hasRoute()) return;
+
+    const result =  await firstValueFrom(this._aiRouteService.saveAiRoute(idRoute, { saved }))
     
-    this._routeStore.updateSavedRoute(this._routeStore.getRoute().route.saved)
+    if(result.hasOwnProperty('message')){
+      toast.success('La ruta ha sido guarda con exito');
+      if(saved) this.hasSavedRoute.set(true);
+      else this.hasSavedRoute.set(false)
+    }
+
+    this._routeStore.updateSavedRoute(this.hasSavedRoute())
   }
 
   /** Comparte un resumen de la ruta o lo copia al portapapeles como alternativa. */
   protected async shareRoute(): Promise<void> {
-    if (!this.hasRoute()) {
-      return;
-    }
-
+    if (!this.hasRoute()) return;
     const text = `${this.origin()} → ${this.destination()} · ${this.distance()} km`;
 
     try {

@@ -119,16 +119,29 @@
   </div>
 
   <div hlmCardFooter class="flex-col gap-2 border-t border-border/60 p-5 sm:flex-row sm:items-center">
-    <button
-      hlmBtn
-      type="button"
-      [disabled]="!hasRoute()"
-      (click)="saveRoute()"
-      class="h-11 w-full gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90 sm:w-auto sm:px-6"
-    >
-      <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
-      Guardar ruta
-    </button>
+    @if(!hasSavedRoute()){
+      <button
+        hlmBtn
+        type="button"
+        [disabled]="!hasRoute()"
+        (click)="saveRoute(true)"
+        class="h-11 w-full gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90 sm:w-auto sm:px-6"
+      >
+        <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
+        Guardar ruta
+      </button>
+    }@else{
+      <button
+        hlmBtn
+        type="button"
+        [disabled]="!hasRoute()"
+        (click)="saveRoute(false)"
+        class="h-11 w-full gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90 sm:w-auto sm:px-6"
+      >
+        <ng-icon name="lucideSaveOff" class="size-4" aria-hidden="true" />
+        Deshacer guardado
+      </button> 
+    }
 
     <button
       hlmBtn
