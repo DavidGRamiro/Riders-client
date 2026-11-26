@@ -55,11 +55,21 @@
               <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
             </button>
 
-            <button hlmBtn size="sm"
-              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium cursor-pointer">
-              Guardar ruta
-              <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
-            </button>
+            @if(!route.saved){
+              <button hlmBtn size="sm"
+                class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium cursor-pointer"
+                (click)="saveRoute(route.id, true)">
+                Guardar ruta
+                <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
+              </button>
+            }@else {
+              <button hlmBtn size="sm"
+                class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium cursor-pointer"
+                (click)="saveRoute(route.id, false)">
+                Eliminar de mis rutas 
+                <ng-icon name="lucideSaveOff" class="size-4" aria-hidden="true" />
+              </button>
+            }
 
             <button hlmBtn variant="destructive"
               (click)="onDeleteRoute(route.id)"

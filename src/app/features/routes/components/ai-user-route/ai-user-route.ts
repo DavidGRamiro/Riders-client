@@ -21,7 +21,7 @@ import { lucideNavigationOff } from "@ng-icons/lucide";
 import { formatTime } from '../../../../shared/utils';
 import { lucideBookmark } from "@ng-icons/lucide";
 import { HlmNumberedPagination } from "@spartan-ng/helm/pagination";
-import { ResponsePaginator } from '../../../../shared/interfaces/paginator.interface';
+import { lucideSaveOff } from "@ng-icons/lucide";
 
 
 type SortOrder = 'recent' | 'oldest';
@@ -33,7 +33,7 @@ type SortOrder = 'recent' | 'oldest';
   imports: [NgIcon, HlmNativeSelectImports, HlmSwitchImports, DatePipe, HlmButtonImports, RouteMap, HlmNumberedPagination],
   templateUrl: './ai-user-route.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideIcons({ lucideBike, lucideDownload, lucideSearch, lucideZap, lucideDelete, lucideNavigationOff, lucideBookmark})],
+  providers: [provideIcons({ lucideBike, lucideDownload, lucideSearch, lucideZap, lucideDelete, lucideNavigationOff, lucideBookmark, lucideSaveOff})],
 })
 export class AiUserRoute implements OnInit{
   /** Indica si se ha generado una nueva ruta. */
@@ -100,8 +100,6 @@ export class AiUserRoute implements OnInit{
           }
          ))  )
       ).subscribe(( response : any ) => {
-        console.log(response);
-        
         this.userRoutes.set(response.results);
         this.totalItems.set(response.count);
       });
@@ -123,7 +121,6 @@ export class AiUserRoute implements OnInit{
 
   /** Devuelve la etiqueta legible del tipo de ruta. */
   public getTypeOfRoute( route_type : string) : string{
-    
     let type_text = ''
     switch(route_type){
       case 'relaxed':
@@ -199,6 +196,17 @@ export class AiUserRoute implements OnInit{
       this.refreshSubject.next()
     } catch (error) {
       toast.error('No se ha podido eliminar la ruta, intentelo mas tarde.')
+    }
+  }
+
+  /** Guarda la ruta entre las favoritas del usuario */
+  public async saveRoute(id : number, saved: boolean){
+    try {
+      await firstValueFrom(this._routeService.saveAiRoute(id, {saved}))
+      toast.success('Ruta guardada correctamente. Consulta tu garaje para más detalles.' )
+      this.refreshSubject.next()
+    } catch (error) {
+      toast.error('No se ha podido guardar la ruta, intentelo mas tarde.')
     }
   }
 }
