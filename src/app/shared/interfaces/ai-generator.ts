@@ -1,5 +1,11 @@
 
 
+export interface WayPointCoordinate {
+  name: string;
+  lat: number;
+  lon: number;
+}
+
 export interface OllamaResponse {
   avoid_motorways: boolean;
   destination: string;
@@ -9,13 +15,20 @@ export interface OllamaResponse {
   route_type: string;
   title: string;
   way_points: string[];
-  way_points_coords: any[];
+  way_points_coords: WayPointCoordinate[];
 }
 
 export interface RouteResponse {
+  id: number;
+  saved: boolean;
   ollama: OllamaResponse;
-  route_engine : RouteEngineResponse;
-  route: RouteAIUser
+  route_engine: RouteEngineResponse;
+}
+
+export interface GeneratedRouteResponse extends Omit<RouteResponse, 'id' | 'saved'> {
+  id?: number;
+  saved?: boolean;
+  route?: { id: number; saved: boolean };
 }
 
 export interface RouteEngineResponse {
@@ -38,7 +51,6 @@ export interface AiRouteFormModel {
   destination: string | null;
 }
 
-export interface RouteAIUser{
-  id: number,
-  saved: boolean
+export interface GenerateRouteRequest extends Omit<AiRouteFormModel, 'prefer_curvy_roads'> {
+  prefer_curvy_roads?: boolean;
 }

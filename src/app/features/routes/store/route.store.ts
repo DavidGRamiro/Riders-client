@@ -3,6 +3,8 @@ import { RouteResponse } from "../../../shared/interfaces/ai-generator";
 
 
 const initialState : RouteResponse = {
+  id: 0,
+  saved: false,
   ollama : {
     avoid_motorways: false,
     destination: '',
@@ -19,10 +21,6 @@ const initialState : RouteResponse = {
     duration: 0,
     coordinates: [],
   },
-  route:{
-    id: 0,
-    saved: false,
-  }
 }
 
 export const RouteStore = signalStore(
@@ -41,9 +39,9 @@ export const RouteStore = signalStore(
       patchState(store, initialState)
     },
 
-    // Update la variable saved de route
+    // Update the saved flag of the current route
     updateSavedRoute(saved: boolean){
-      patchState(store, { route: { id: store.route().id, saved } })
+      patchState(store, { saved })
     },
 
     // Get all Route data

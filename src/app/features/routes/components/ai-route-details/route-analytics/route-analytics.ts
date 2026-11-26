@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
@@ -53,7 +53,8 @@ const ROUTE_TYPE_LABELS: Record<string, string> = {
 })
 export class RouteAnalytics {
   private readonly _routeStore = inject(RouteStore);
-  private _aiRouteService = inject(RouteService)
+  private readonly _routeService = inject(RouteService);
+  private readonly saveButton = viewChild<ElementRef<HTMLButtonElement>>('saveButton');
 
   /** Indica si existe una ruta generada con coordenadas utilizables. */
   protected readonly hasRoute = computed(() => this._routeStore.route_engine().coordinates.length > 0);
@@ -68,9 +69,30 @@ export class RouteAnalytics {
     () => this._routeStore.ollama().destination.trim() || 'Destino sin definir',
   );
 
-  /** Control de si la ruta generada ha sido guardada por el usuario o no */
-  protected hasSavedRoute = signal<boolean>(false)
+  /** Indica si la ruta actual ya está guardada en el garaje. */
+  protected readonly isSaved = computed(() => this._routeStore.saved());
 
+  /** Indica si la ruta generada tiene un id válido para guardarla. */
+  protected readonly canSaveRoute = computed(
+    () => this.hasRoute() && this._routeStore.id() > 0,
+  );
+
+  /** Evita envíos duplicados mientras se completa la petición. */
+  protected readonly isSaving = signal(false);
+
+  /** Indica si el botón de guardado no está disponible. */
+  protected readonly saveDisabled = computed(() => !this.canSaveRoute() || this.isSaving());
+
+  /** Etiqueta del botón de guardado según el estado actual. */
+  protected readonly saveLabel = computed(() => {
+    if (this.isSaving()) return 'Guardando…';
+    return this.isSaved() ? 'Deshacer guardado' : 'Guardar ruta';
+  });
+
+  /** Icono del botón de guardado según el estado actual. */
+  protected readonly saveIcon = computed(() =>
+    this.isSaved() ? 'lucideSaveOff' : 'lucideBookmark',
+  );
 
   /** Puntos de paso intermedios. */
   protected readonly wayPoints = computed(() => this._routeStore.ollama().way_points);
@@ -88,20 +110,32 @@ export class RouteAnalytics {
   /** Indica si la ruta prioriza carreteras con curvas. */
   protected readonly prefersCurves = computed(() => this._routeStore.ollama().prefer_curvy_roads);
 
-  /** Guarda la ruta generada en el garaje del usuario. */
+  /** Alterna el estado guardado de la ruta generada. */
+  protected toggleSavedRoute(): void {
+    void this.saveRoute(!this.isSaved());
+  }
+
+  /** Guarda o desguarda la ruta generada en el garaje del usuario. */
   protected async saveRoute(saved: boolean): Promise<void> {
-    const idRoute = this._routeStore.getRoute().route.id;
-    if (!this.hasRoute()) return;
+    if (!this.canSaveRoute() || this.isSaving()) return;
 
-    const result =  await firstValueFrom(this._aiRouteService.saveAiRoute(idRoute, { saved }))
-    
-    if(result.hasOwnProperty('message')){
-      toast.success('La ruta ha sido guarda con exito');
-      if(saved) this.hasSavedRoute.set(true);
-      else this.hasSavedRoute.set(false)
+    this.isSaving.set(true);
+    try {
+      const response = await firstValueFrom(
+        this._routeService.saveRoute(this._routeStore.id(), saved),
+      );
+      this._routeStore.updateSavedRoute(response.saved);
+      toast.success(
+        response.saved
+          ? 'Ruta guardada en tu garaje'
+          : 'Ruta eliminada de tu garaje',
+      );
+    } catch {
+      toast.error('No se pudo actualizar el guardado de la ruta. Inténtalo de nuevo.');
+    } finally {
+      this.isSaving.set(false);
+      this.saveButton()?.nativeElement.focus();
     }
-
-    this._routeStore.updateSavedRoute(this.hasSavedRoute())
   }
 
   /** Comparte un resumen de la ruta o lo copia al portapapeles como alternativa. */
