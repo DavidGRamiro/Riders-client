@@ -1,30 +1,27 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, OnInit, signal, untracked } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideBike,
+  lucideDelete,
   lucideDownload,
+  lucideNavigationOff,
   lucideSearch,
   lucideZap,
 } from '@ng-icons/lucide';
 import { HlmNativeSelectImports } from '@spartan-ng/helm/native-select';
 import { HlmSwitchImports } from '@spartan-ng/helm/switch';
 import { RouteService } from '../../services/route-service';
-import { catchError, combineLatest, combineLatestWith, debounceTime, distinctUntilChanged, EMPTY, firstValueFrom, startWith, Subject, switchMap } from 'rxjs';
+import { catchError, combineLatest, debounceTime, distinctUntilChanged, EMPTY, expand, firstValueFrom, map, reduce, startWith, Subject, switchMap } from 'rxjs';
 import { toast } from '@spartan-ng/brain/sonner';
-import { RouteAiResponse } from '../../interfaces/route-ai.interface';
+import { RouteAiQueryParams, RouteAiResponse } from '../../interfaces/route-ai.interface';
 import type { LatLngTuple } from 'leaflet';
 import { DatePipe } from '@angular/common';
 import { RouteMap, RouteMapMarker } from '../ai-route-details/route-map/route-map';
-import { lucideDelete } from "@ng-icons/lucide";
-import { HlmButtonImports } from "@spartan-ng/helm/button";
-import { lucideNavigationOff } from "@ng-icons/lucide";
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { formatTime } from '../../../../shared/utils';
-import { lucideBookmark } from "@ng-icons/lucide";
-import { HlmNumberedPagination } from "@spartan-ng/helm/pagination";
+import { HlmNumberedPagination } from '@spartan-ng/helm/pagination';
 import { ResponsePaginator } from '../../../../shared/interfaces/paginator.interface';
-
-
-type SortOrder = 'recent' | 'oldest';
 
 
 /** Historial de rutas generadas por el usuario con buscador, filtros y paginación. */
@@ -33,7 +30,7 @@ type SortOrder = 'recent' | 'oldest';
   imports: [NgIcon, HlmNativeSelectImports, HlmSwitchImports, DatePipe, HlmButtonImports, RouteMap, HlmNumberedPagination],
   templateUrl: './ai-user-route.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideIcons({ lucideBike, lucideDownload, lucideSearch, lucideZap, lucideDelete, lucideNavigationOff, lucideBookmark})],
+  providers: [provideIcons({ lucideBike, lucideDownload, lucideSearch, lucideZap, lucideDelete, lucideNavigationOff })],
 })
 export class AiUserRoute implements OnInit{
   /** Indica si se ha generado una nueva ruta. */
@@ -41,8 +38,12 @@ export class AiUserRoute implements OnInit{
 
   /** Orden de los resultados. */
   protected readonly sortOrder = signal('-id');
-  /** Indica si solo se muestran rutas con track GPX disponible. */
-  protected readonly onlyGpx = signal(false);
+  /** Indica si el listado se limita a las rutas guardadas. */
+  protected readonly onlySavedRoutes = signal(false);
+  /** Emisiones del filtro de guardadas para combinarlas con el resto de filtros. */
+  private readonly onlySavedRoutes$ = toObservable(this.onlySavedRoutes);
+  /** Evita una petición duplicada durante la inicialización. */
+  private readonly hasSyncedInitialRoute = signal(false);
   /** Carga de rutas generadas por el usuario */
   public userRoutes = signal<RouteAiResponse[]>([])
 
@@ -55,8 +56,6 @@ export class AiUserRoute implements OnInit{
 	public readonly totalItems = signal(0);
 
   //Filtros
-  /** Texto actual de búsqueda. */
-  private textSearch = signal<string>('')
   /** Stream de búsqueda con debounce. */
   private searchSubject = new Subject<string>();
   /** Stream de cambios de orden. */
@@ -71,45 +70,84 @@ export class AiUserRoute implements OnInit{
   /** Sincroniza la carga de rutas al crear una nueva o cambiar de página. */
   constructor(){
     effect(() => {
-      if(this.newRoute() || this.page()){
-        this.getRoutesAiUser(untracked(() => this.textSearch()), untracked(() => this.sortOrder()))
+      this.newRoute();
+      this.page();
+      if (untracked(() => !this.hasSyncedInitialRoute())) {
+        this.hasSyncedInitialRoute.set(true);
+        return;
       }
+      this.refreshSubject.next();
     })
   }
 
   /** Inicializa los streams de búsqueda, orden y refresco de rutas. */
   ngOnInit(): void {
-    this.searchSubject
-      .pipe(
+    combineLatest([
+      this.searchSubject.pipe(
         debounceTime(1000),
         distinctUntilChanged(),
         startWith(''),
-        combineLatestWith(
-          this.orderSubject.pipe(
-            startWith('-id'),
-            distinctUntilChanged()
+      ),
+      this.orderSubject.pipe(startWith('-id'), distinctUntilChanged()),
+      this.onlySavedRoutes$,
+      this.refreshSubject.pipe(startWith(undefined)),
+    ])
+      .pipe(
+        switchMap(([search, order, onlySaved]) =>
+          this.fetchRoutes(search, order, onlySaved).pipe(
+            map((response) => ({ response, onlySaved })),
+            catchError(() => {
+              toast.error('No se han podido recuperar las rutas generadas con IA.');
+              return EMPTY;
+            }),
           ),
-          this.refreshSubject.pipe(
-            startWith(undefined)
-          )
         ),
-        switchMap(([search, order]) => this.getRoutesAiUser(search, order).pipe(catchError(
-          () => {
-            toast.error("No se han podido recuperar las rutas generadas con IA.");
-            return EMPTY;
-          }
-         ))  )
-      ).subscribe(( response : any ) => {
-        this.userRoutes.set(response.results);
-        this.totalItems.set(response.count);
+      )
+      .subscribe(({ response, onlySaved }) => {
+        const results = onlySaved
+          ? response.results.filter((route) => route.saved)
+          : response.results;
+        this.userRoutes.set(results);
+        this.totalItems.set(onlySaved ? results.length : response.count);
       });
   }
 
-  /** Fetch routes generated by AI and request from the user authenticated. */
-  private getRoutesAiUser(search: string | null = null, order: string){
-    const params : any = { page: this.page(), ordering: order}
-    if(search && search != ''){
-      params['search'] = search
+  /** Recupera todas las páginas cuando se filtran las rutas guardadas. */
+  private fetchRoutes(search: string | null, order: string, onlySaved: boolean){
+    if (!onlySaved) {
+      return this.getRoutesAiUser(search, order, false, this.page())
+    }
+
+    const emptyPage: ResponsePaginator<RouteAiResponse> = {
+      results: [],
+      count: 0,
+      next: null,
+      previous: null,
+    }
+
+    return this.getRoutesAiUser(search, order, true, 1).pipe(
+      expand((response, index) =>
+        response.next ? this.getRoutesAiUser(search, order, true, index + 2) : EMPTY,
+      ),
+      reduce(
+        (accumulator, response) => ({
+          ...accumulator,
+          results: [...accumulator.results, ...response.results],
+          count: response.count,
+        }),
+        emptyPage,
+      ),
+    )
+  }
+
+  /** Fetch routes generated by AI and requested by the authenticated user. */
+  private getRoutesAiUser(search: string | null = null, order: string, onlySaved = false, page = this.page()){
+    const params: RouteAiQueryParams = { page, ordering: order }
+    if (search) {
+      params.search = search
+    }
+    if (onlySaved) {
+      params.saved = true
     }
     return this._routeService.getRoutesAiUser(params)
   }
@@ -121,7 +159,6 @@ export class AiUserRoute implements OnInit{
 
   /** Devuelve la etiqueta legible del tipo de ruta. */
   public getTypeOfRoute( route_type : string) : string{
-    
     let type_text = ''
     switch(route_type){
       case 'relaxed':
@@ -141,18 +178,14 @@ export class AiUserRoute implements OnInit{
   }
 
   /** Construye los marcadores del mapa a partir de las coordenadas. */
-  public formatMarkers(coords : [] | {}) : RouteMapMarker[]{
-    let markers : RouteMapMarker[] = []
-    
-    if(Array.isArray(coords) && coords.length > 0){
-      for(const coord of coords){
-        markers.push({
-          position: [coord.lat, coord.lon],
-          label: coord.name
-        })
-      }
+  public formatMarkers(coords: RouteAiResponse['way_points_coords']): RouteMapMarker[] {
+    if (!Array.isArray(coords)) {
+      return []
     }
-    return markers
+    return coords.map((coord) => ({
+      position: [coord.lat, coord.lon],
+      label: coord.name
+    }))
   }
 
   /** Formatea la duración total de la ruta. */
@@ -184,9 +217,15 @@ export class AiUserRoute implements OnInit{
   }
 
   /** Actualiza el orden de los resultados seleccionado. */
-  public updateSortOrder(event:any){
-    const value = event === 'id' ? 'id' : '-id'
-    this.orderSubject.next(value)
+  public updateSortOrder(value: string | null | undefined){
+    const order = value === 'id' ? 'id' : '-id'
+    this.orderSubject.next(order)
+  }
+
+  /** Activa o desactiva el filtro de rutas guardadas. */
+  public onSavedFilterChange(event: Event){
+    this.onlySavedRoutes.set((event.target as HTMLInputElement).checked)
+    this.page.set(1)
   }
 
   /** Elimina una ruta generada y refresca el listado. */
@@ -195,7 +234,7 @@ export class AiUserRoute implements OnInit{
       await firstValueFrom(this._routeService.deleteRoute(id))
       toast.success('Ruta eliminada correctamente.')
       this.refreshSubject.next()
-    } catch (error) {
+    } catch {
       toast.error('No se ha podido eliminar la ruta, intentelo mas tarde.')
     }
   }

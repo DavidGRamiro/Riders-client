@@ -28,6 +28,17 @@
         <option hlmNativeSelectOption value="-id">Más recientes</option>
         <option hlmNativeSelectOption value="id">Más antiguas</option>
       </hlm-native-select>
+
+      <label for="ai-user-route-saved" class="flex h-11 items-center gap-2 rounded-md border border-border/60 bg-white/[0.02] px-3.5 text-sm text-muted-foreground">
+        <input
+          id="ai-user-route-saved"
+          type="checkbox"
+          [checked]="onlySavedRoutes()"
+          (change)="onSavedFilterChange($event)"
+          class="size-4 accent-foreground"
+        />
+        Solo guardadas
+      </label>
     </div>
   </div>
 
@@ -53,12 +64,6 @@
             >
               .GPX
               <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
-            </button>
-
-            <button hlmBtn size="sm"
-              class="inline-flex h-9 items-center gap-2 rounded-md border border-border/60 px-3.5 text-sm font-medium cursor-pointer">
-              Guardar ruta
-              <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
             </button>
 
             <button hlmBtn variant="destructive"
@@ -116,7 +121,9 @@
   </div>
 
   <!-- Paginación -->
-  <div class="flex flex-col gap-4 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-    <hlm-numbered-pagination [(currentPage)]="page" [(itemsPerPage)]="pageSize" [totalItems]="totalItems()" [pageSizes]="[5,10,20]" />
-  </div>
+  @if (!onlySavedRoutes()) {
+    <div class="flex flex-col gap-4 border-t border-border/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <hlm-numbered-pagination [(currentPage)]="page" [(itemsPerPage)]="pageSize" [totalItems]="totalItems()" [pageSizes]="[5,10,20]" />
+    </div>
+  }
 </div>

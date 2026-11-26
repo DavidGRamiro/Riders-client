@@ -120,14 +120,18 @@
 
   <div hlmCardFooter class="flex-col gap-2 border-t border-border/60 p-5 sm:flex-row sm:items-center">
     <button
+      #saveButton
       hlmBtn
       type="button"
-      [disabled]="!hasRoute()"
-      (click)="saveRoute()"
+      [disabled]="isSaving()"
+      [attr.aria-disabled]="saveDisabled()"
+      [attr.aria-busy]="isSaving()"
+      [class.opacity-60]="saveDisabled()"
+      (click)="toggleSavedRoute()"
       class="h-11 w-full gap-2 rounded-md bg-foreground text-sm font-semibold text-background hover:bg-foreground/90 sm:w-auto sm:px-6"
     >
-      <ng-icon name="lucideBookmark" class="size-4" aria-hidden="true" />
-      Guardar ruta
+      <ng-icon [name]="saveIcon()" class="size-4" aria-hidden="true" />
+      {{ saveLabel() }}
     </button>
 
     <button
