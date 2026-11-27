@@ -1,2 +1,2 @@
-export * from './splash'
-export * from './theme'
+export * from './splash';
+export * from './theme';
