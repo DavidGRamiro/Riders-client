@@ -1,39 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
   IMAGE_LOADER,
   ImageLoaderConfig,
-  NgOptimizedImage,
 } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  lucideActivity,
-  lucideArrowRight,
-  lucideArrowRightLeft,
-  lucideBatteryCharging,
   lucideBike,
   lucideBookmark,
   lucideCalendarDays,
-  lucideCamera,
-  lucideCheck,
-  lucideCircleDot,
-  lucideCloudUpload,
-  lucideClock,
-  lucideDownload,
-  lucideFuel,
-  lucideGauge,
-  lucideHeart,
-  lucideMap,
-  lucideMountain,
   lucidePlus,
   lucideRadio,
   lucideRoute,
-  lucideShieldCheck,
   lucideSlidersHorizontal,
   lucideWifi,
   lucideWrench,
-  lucideX,
 } from '@ng-icons/lucide';
 import { UserBikes, UserRoutesSummary, UserEventsSummary, UserBikeForm } from '../../../features/garage/components';
 
@@ -46,30 +26,9 @@ interface GarageTab {
   readonly count: number | null;
   readonly target: string;
 }
-
-interface GarageEvent {
-  readonly month: string;
-  readonly day: string;
-  readonly type: string;
-  readonly title: string;
-  readonly location: string;
-  readonly time: string;
-  readonly riders: readonly string[];
-  readonly extra: number;
-}
-
-interface RideCategory {
-  readonly id: string;
-  readonly label: string;
-}
-
-interface LicenseOption {
-  readonly id: string;
-  readonly label: string;
-}
 @Component({
   selector: 'app-garage',
-  imports: [NgOptimizedImage, NgIcon, ReactiveFormsModule, RouterLink, UserBikes, UserRoutesSummary, UserEventsSummary, UserBikeForm],
+  imports: [NgIcon, UserBikes, UserRoutesSummary, UserEventsSummary, UserBikeForm],
   templateUrl: './garage.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -78,32 +37,15 @@ interface LicenseOption {
       useValue: (config: ImageLoaderConfig) => config.src,
     },
     provideIcons({
-      lucideActivity,
-      lucideArrowRight,
-      lucideArrowRightLeft,
-      lucideBatteryCharging,
+      lucideRadio,
+      lucideWifi,
+      lucideSlidersHorizontal,
+      lucidePlus,
       lucideBike,
+      lucideRoute,
       lucideBookmark,
       lucideCalendarDays,
-      lucideCamera,
-      lucideCheck,
-      lucideCircleDot,
-      lucideCloudUpload,
-      lucideClock,
-      lucideDownload,
-      lucideFuel,
-      lucideGauge,
-      lucideHeart,
-      lucideMap,
-      lucideMountain,
-      lucidePlus,
-      lucideRadio,
-      lucideRoute,
-      lucideShieldCheck,
-      lucideSlidersHorizontal,
-      lucideWifi,
-      lucideWrench,
-      lucideX,
+      lucideWrench
     }),
   ],
 })

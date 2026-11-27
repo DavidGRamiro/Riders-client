@@ -1,12 +1,22 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideArrowRightLeft, lucideCheck, lucideCloudUpload, lucideShieldCheck, lucideX } from '@ng-icons/lucide';
 
 @Component({
   selector: 'app-user-bike-form',
   imports: [NgIcon, ReactiveFormsModule],
   templateUrl: './user-bike-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    provideIcons({
+      lucideArrowRightLeft,
+      lucideX,
+      lucideCheck,
+      lucideCloudUpload,
+      lucideShieldCheck,
+    }),
+  ]
 })
 export class UserBikeForm {
 

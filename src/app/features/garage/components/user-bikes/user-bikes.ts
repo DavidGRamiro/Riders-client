@@ -1,6 +1,7 @@
 import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideBatteryCharging, lucideCamera, lucideCircleDot, lucideCloudUpload, lucideFuel, lucideGauge, lucideSlidersHorizontal } from '@ng-icons/lucide';
 
 
 
@@ -12,6 +13,17 @@ const imageUrl = (id: string, width = 1400) =>
   imports: [NgOptimizedImage, NgIcon,],
   templateUrl: './user-bikes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    provideIcons({
+      lucideCamera,
+      lucideSlidersHorizontal,
+      lucideCloudUpload,
+      lucideCircleDot,
+      lucideGauge,
+      lucideBatteryCharging,
+      lucideFuel,
+    }),
+  ]
 })
 export class UserBikes {
 

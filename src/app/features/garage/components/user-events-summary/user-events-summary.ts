@@ -1,11 +1,17 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideMap } from '@ng-icons/lucide';
 
 @Component({
   selector: 'app-user-events-summary',
   imports: [NgIcon],
   templateUrl: './user-events-summary.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    provideIcons({
+      lucideMap,
+    }),
+  ]
 })
 export class UserEventsSummary {
 
