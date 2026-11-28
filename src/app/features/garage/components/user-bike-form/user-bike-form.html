@@ -1,133 +1,99 @@
-  <form hlmCard [formGroup]="registerForm" (ngSubmit)="registerBike()">
-    <hlm-card-header class="border-b">
-      <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-        Módulo Alta V2.4
-      </p>
-      <h2 hlmCardTitle>Registrar Nueva Moto</h2>
-      <p hlmCardDescription>
-        Añade una montura a tu flota para vincular telemetría OBD y consumo de rutas.
-      </p>
-    </hlm-card-header>
-
-    <div hlmCardContent class="flex flex-col gap-6">
-      <fieldset hlmFieldSet>
-        <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
-          01 // Datos Básicos
-        </legend>
-
-        <hlm-field-group class="grid grid-cols-2 gap-3">
-          <hlm-field>
-            <label hlmFieldLabel for="garage-model">Marca y Modelo Completo</label>
-            <input
-              hlmInput
-              id="garage-model"
-              type="text"
-              formControlName="model"
-              placeholder="Ej: Husqvarna Norden 901 Expedition"
-            />
-          </hlm-field>
-
-          <hlm-field>
-            <label hlmFieldLabel for="garage-year">Año Fab.</label>
-            <input
-              hlmInput
-              id="garage-year"
-              type="text"
-              inputmode="numeric"
-              formControlName="year"
-            />
-          </hlm-field>
-
-          <hlm-field>
-            <label hlmFieldLabel for="garage-plate">Matrícula o VIN</label>
-            <input hlmInput id="garage-plate" type="text" formControlName="plate" />
-          </hlm-field>
-
-          <hlm-field>
-            <label hlmFieldLabel for="garage-displacement">Cilindrada (cc)</label>
-            <input hlmInput id="garage-displacement" type="text" formControlName="displacement" />
-          </hlm-field>
-
-          <hlm-field>
-            <label hlmFieldLabel for="garage-power">Potencia (CV)</label>
-            <input hlmInput id="garage-power" type="text" formControlName="power" />
-          </hlm-field>
-        </hlm-field-group>
-      </fieldset>
-
-      <fieldset hlmFieldSet>
-        <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
-          02 // Categoría &amp; Configuración
-        </legend>
-
-        <hlm-field>
-          <hlm-field-title>Tipología de Conducción</hlm-field-title>
-          <hlm-toggle-group
-            formControlName="category"
-            variant="outline"
-            spacing="2"
-            class="grid w-full grid-cols-2 gap-2"
-          >
-            @for (category of categories; track category.id) {
-              <button hlmToggleGroupItem type="button" [value]="category.id" class="w-full justify-between px-3 text-xs">
-                {{ category.label }}
-              </button>
-            }
-          </hlm-toggle-group>
-        </hlm-field>
-
-        <fieldset hlmFieldSet>
-          <legend hlmFieldLegend variant="label">Estado de Limitación Carnet</legend>
-          <hlm-radio-group formControlName="license" class="grid-cols-2">
-            @for (license of licenses; track license.id) {
-              <label hlmLabel>
-                <hlm-radio [value]="license.id" [aria-label]="license.label">
-                  <hlm-radio-indicator />
-                </hlm-radio>
-                {{ license.label }}
-              </label>
-            }
-          </hlm-radio-group>
-        </fieldset>
-      </fieldset>
-
-      <fieldset hlmFieldSet>
-        <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
-          03 // Fotografía &amp; Sensores
-        </legend>
-
-        <hlm-field>
-          <label hlmFieldLabel for="garage-photo">Fotografía Principal de Portada</label>
-          <input hlmInput id="garage-photo" type="file" accept="image/*" />
-          <hlm-field-description>Resolución recomendada: 1920x1080px (máx 15MB)</hlm-field-description>
-        </hlm-field>
-
-        <hlm-field orientation="horizontal">
-          <hlm-checkbox inputId="garage-obd" formControlName="obd" />
-          <div class="flex flex-col gap-1">
-            <label hlmLabel for="garage-obd">Vincular con OBD-II / Garmin Connect</label>
-            <hlm-field-description>
-              Sincroniza presiones de neumáticos, temperatura del refrigerante y consumo por ruta en tiempo real.
-            </hlm-field-description>
-          </div>
-        </hlm-field>
-      </fieldset>
-    </div>
-
-    <hlm-card-footer class="flex-col items-stretch gap-3 border-t">
-      <button hlmBtn type="submit" size="lg" class="w-full">Registrar en Garaje</button>
-      <p class="flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
-        <ng-icon name="lucideShieldCheck" class="size-3" aria-hidden="true" />
-        Seguridad cifrada TLS 1.3 · Telemetría compatible Euro 5 / 5+
-      </p>
-    </hlm-card-footer>
-  </form>
-
-<hlm-card size="sm" class="gap-0 py-0">
-  <div hlmCardContent class="flex items-center justify-between gap-2 py-4">
+<form hlmCard [formRoot]="registerForm">
+  <hlm-card-header class="border-b">
     <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-      Montura secundaria · En garaje
+      Módulo Alta V2.4
     </p>
-    <hlm-badge variant="outline">Standby</hlm-badge>
+    <h2 hlmCardTitle>Registrar Nueva Moto</h2>
+    <p hlmCardDescription>
+      Añade una montura a tu flota para vincular telemetría OBD y consumo de rutas.
+    </p>
+  </hlm-card-header>
+
+  <div hlmCardContent class="flex flex-col gap-6">
+    <fieldset hlmFieldSet>
+      <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
+        01 // Datos Básicos
+      </legend>
+
+      <hlm-field-group class="grid grid-cols-2 gap-3">
+        <hlm-field>
+          <label hlmFieldLabel for="garage-model">Marca</label>
+          <input hlmInput id="garage-model" type="text" [formField]="registerForm.model"
+            placeholder="Ej: Husqvarna Norden 901 Expedition" />
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="garage-model">Modelo Completo</label>
+          <input hlmInput type="text" [formField]="registerForm.brand" placeholder="Ej: Norden 901 Expedition" />
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="garage-model">Color</label>
+          <input hlmInput type="text" [formField]="registerForm.color" placeholder="Ej: Rojo Ducati" />
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="garage-year">Año fabricación.</label>
+          <input hlmInput id="garage-year" type="text" inputmode="numeric" [formField]="registerForm.year" />
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="garage-displacement">Cilindrada (cc)</label>
+          <input hlmInput id="garage-displacement" type="text" [formField]="registerForm.engine_cc" />
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="garage-power">Potencia (CV)</label>
+          <input hlmInput id="garage-power" type="text" [formField]="registerForm.engine_power" />
+        </hlm-field>
+      </hlm-field-group>
+
+      <hlm-field-group>
+        <hlm-field>
+          <label hlmFieldLabel for="alternative">Descripción adicional (será visualizado por los demás usuarios)</label>
+          <textarea hlmTextarea id="alternative" placeholder="Añade una breve descripción de tu moto"
+            [formField]="registerForm.alternative_text"></textarea>
+        </hlm-field>
+      </hlm-field-group>
+
+    </fieldset>
+
+    <fieldset hlmFieldSet>
+      <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
+        02 // Categoría &amp; Configuración
+      </legend>
+
+      <hlm-field>
+        <hlm-field-title>Tipología de Conducción</hlm-field-title>
+        <hlm-toggle-group variant="outline" spacing="2" class="grid w-full grid-cols-2 gap-2">
+          @for (category of categories; track category.id) {
+          <button hlmToggleGroupItem type="button" [value]="category.id" class="w-full justify-between px-3 text-xs">
+            {{ category.label }}
+          </button>
+          }
+        </hlm-toggle-group>
+      </hlm-field>
+    </fieldset>
+
+    <fieldset hlmFieldSet>
+      <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
+        03 // Fotografía &amp; Sensores
+      </legend>
+
+      <hlm-field>
+        <label hlmFieldLabel for="garage-photo">Fotografía Principal de Portada</label>
+        <input hlmInput id="garage-photo" type="file" accept="image/*" />
+        <hlm-field-description>Resolución recomendada: 1920x1080px (máx 15MB)</hlm-field-description>
+      </hlm-field>
+    </fieldset>
   </div>
-</hlm-card>
+
+  <hlm-card-footer class="flex-col items-stretch gap-3 border-t">
+    <button hlmBtn type="submit" size="lg" class="w-full">Registrar en Garaje</button>
+    <p
+      class="flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+      <ng-icon name="lucideShieldCheck" class="size-3" aria-hidden="true" />
+      Seguridad cifrada TLS 1.3 · Telemetría compatible Euro 5 / 5+
+    </p>
+  </hlm-card-footer>
+</form>
