@@ -1,197 +1,133 @@
-<div class="flex flex-col gap-4">
-@if (registerOpen()) {
-<div class="overflow-hidden rounded-lg border border-border/60 bg-card">
-  <div class="flex items-start justify-between gap-3 border-b border-border/60 p-4">
-    <div class="flex flex-col gap-1">
-      <p class="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
-        <span class="size-1.5 rounded-full bg-white" aria-hidden="true"></span>
+  <form hlmCard [formGroup]="registerForm" (ngSubmit)="registerBike()">
+    <hlm-card-header class="border-b">
+      <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground">
         Módulo Alta V2.4
       </p>
-      <h2 class="mt-1 text-xl font-semibold tracking-tight text-foreground">
-        Registrar Nueva Moto
-      </h2>
-      <p class="text-xs leading-relaxed text-muted-foreground">
+      <h2 hlmCardTitle>Registrar Nueva Moto</h2>
+      <p hlmCardDescription>
         Añade una montura a tu flota para vincular telemetría OBD y consumo de rutas.
       </p>
-    </div>
-  </div>
+    </hlm-card-header>
 
-  <form [formGroup]="registerForm" (ngSubmit)="registerBike()" class="flex flex-col gap-5 p-4">
-    <fieldset class="flex flex-col gap-3">
-      <legend
-        class="flex w-full items-center justify-between font-mono text-[9px] uppercase tracking-[0.14em] text-foreground">
-        <span>01 // Datos Básicos</span>
-        <span class="text-[8px] text-muted-foreground">Obligatorio</span>
-      </legend>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="garage-model" class="text-[11px] font-medium text-muted-foreground">
-          Marca y Modelo Completo
-        </label>
-        <input id="garage-model" type="text" formControlName="model" placeholder="Ej: Husqvarna Norden 901 Expedition"
-          class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1.5">
-          <label for="garage-year" class="text-[11px] font-medium text-muted-foreground">
-            Año Fab.
-          </label>
-          <input id="garage-year" type="text" inputmode="numeric" formControlName="year"
-            class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="garage-plate" class="text-[11px] font-medium text-muted-foreground">
-            Matrícula o VIN
-          </label>
-          <input id="garage-plate" type="text" formControlName="plate"
-            class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="garage-displacement" class="text-[11px] font-medium text-muted-foreground">
-            Cilindrada (cc)
-          </label>
-          <input id="garage-displacement" type="text" formControlName="displacement"
-            class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="garage-power" class="text-[11px] font-medium text-muted-foreground">
-            Potencia (CV)
-          </label>
-          <input id="garage-power" type="text" formControlName="power"
-            class="h-10 w-full rounded border border-border/60 bg-black/25 px-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-        </div>
-      </div>
-    </fieldset>
-
-    <fieldset class="flex flex-col gap-3">
-      <legend class="w-full font-mono text-[9px] uppercase tracking-[0.14em] text-foreground">
-        02 // Categoría &amp; Configuración
-      </legend>
-
-      <div class="flex flex-col gap-1.5">
-        <span class="text-[11px] font-medium text-muted-foreground">
-          Tipología de Conducción
-        </span>
-        <div class="grid grid-cols-2 gap-2" role="group" aria-label="Tipología de conducción">
-          @for (category of categories; track category.id) {
-          <button type="button" [attr.aria-pressed]="registerForm.controls.category.value === category.id" [class]="
-                        registerForm.controls.category.value === category.id
-                          ? 'flex h-10 items-center justify-between gap-2 rounded border border-border/80 bg-white/[0.07] px-3 text-left text-[11px] font-medium text-foreground'
-                          : 'flex h-10 items-center justify-between gap-2 rounded border border-transparent bg-white/[0.03] px-3 text-left text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground'
-                      " (click)="setCategory(category.id)">
-            <span>{{ category.label }}</span>
-            @if (registerForm.controls.category.value === category.id) {
-            <ng-icon name="lucideCheck" class="size-3.5" aria-hidden="true" />
-            }
-          </button>
-          }
-        </div>
-      </div>
-
-      <fieldset class="flex flex-col gap-1.5">
-        <legend class="text-[11px] font-medium text-muted-foreground">
-          Estado de Limitación Carnet
+    <div hlmCardContent class="flex flex-col gap-6">
+      <fieldset hlmFieldSet>
+        <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
+          01 // Datos Básicos
         </legend>
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-          @for (license of licenses; track license.id) {
-          <label class="flex cursor-pointer items-center gap-2 text-[11px] text-muted-foreground">
-            <input type="radio" formControlName="license" [value]="license.id"
-              class="size-3.5 accent-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-            {{ license.label }}
-          </label>
-          }
-        </div>
+
+        <hlm-field-group class="grid grid-cols-2 gap-3">
+          <hlm-field>
+            <label hlmFieldLabel for="garage-model">Marca y Modelo Completo</label>
+            <input
+              hlmInput
+              id="garage-model"
+              type="text"
+              formControlName="model"
+              placeholder="Ej: Husqvarna Norden 901 Expedition"
+            />
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="garage-year">Año Fab.</label>
+            <input
+              hlmInput
+              id="garage-year"
+              type="text"
+              inputmode="numeric"
+              formControlName="year"
+            />
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="garage-plate">Matrícula o VIN</label>
+            <input hlmInput id="garage-plate" type="text" formControlName="plate" />
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="garage-displacement">Cilindrada (cc)</label>
+            <input hlmInput id="garage-displacement" type="text" formControlName="displacement" />
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="garage-power">Potencia (CV)</label>
+            <input hlmInput id="garage-power" type="text" formControlName="power" />
+          </hlm-field>
+        </hlm-field-group>
       </fieldset>
-    </fieldset>
 
-    <fieldset class="flex flex-col gap-3">
-      <legend class="w-full font-mono text-[9px] uppercase tracking-[0.14em] text-foreground">
-        03 // Fotografía &amp; Sensores
-      </legend>
+      <fieldset hlmFieldSet>
+        <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
+          02 // Categoría &amp; Configuración
+        </legend>
 
-      <div class="flex flex-col gap-1.5">
-        <span class="text-[11px] font-medium text-muted-foreground">
-          Fotografía Principal de Portada
-        </span>
-        <label for="garage-photo"
-          class="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded border border-dashed border-border/70 bg-black/25 px-4 py-5 text-center transition-colors hover:border-border hover:bg-white/[0.02] focus-within:ring-2 focus-within:ring-ring/40">
-          <ng-icon name="lucideCloudUpload" class="size-4 text-muted-foreground" aria-hidden="true" />
-          <span class="text-[11px] font-medium text-foreground">
-            Arrastra o selecciona imagen JPG/RAW
-          </span>
-          <span class="font-mono text-[9px] text-muted-foreground">
-            Resolución recomendada: 1920x1080px (máx 15MB)
-          </span>
-          <input id="garage-photo" type="file" accept="image/*" class="sr-only" />
-        </label>
-      </div>
+        <hlm-field>
+          <hlm-field-title>Tipología de Conducción</hlm-field-title>
+          <hlm-toggle-group
+            formControlName="category"
+            variant="outline"
+            spacing="2"
+            class="grid w-full grid-cols-2 gap-2"
+          >
+            @for (category of categories; track category.id) {
+              <button hlmToggleGroupItem type="button" [value]="category.id" class="w-full justify-between px-3 text-xs">
+                {{ category.label }}
+              </button>
+            }
+          </hlm-toggle-group>
+        </hlm-field>
 
-      <label class="flex cursor-pointer items-start gap-3 rounded border border-border/60 bg-white/[0.03] p-3">
-        <input type="checkbox" formControlName="obd"
-          class="mt-0.5 size-4 shrink-0 accent-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" />
-        <span class="flex flex-col gap-1">
-          <span class="text-xs font-semibold text-foreground">
-            Vincular con OBD-II / Garmin Connect
-          </span>
-          <span class="text-[10px] leading-relaxed text-muted-foreground">
-            Sincroniza presiones de neumáticos, temperatura del refrigerante y consumo por
-            ruta en tiempo real.
-          </span>
-        </span>
-      </label>
-    </fieldset>
+        <fieldset hlmFieldSet>
+          <legend hlmFieldLegend variant="label">Estado de Limitación Carnet</legend>
+          <hlm-radio-group formControlName="license" class="grid-cols-2">
+            @for (license of licenses; track license.id) {
+              <label hlmLabel>
+                <hlm-radio [value]="license.id" [aria-label]="license.label">
+                  <hlm-radio-indicator />
+                </hlm-radio>
+                {{ license.label }}
+              </label>
+            }
+          </hlm-radio-group>
+        </fieldset>
+      </fieldset>
 
-    <div class="flex gap-2">
-      <button type="submit"
-        class="inline-flex h-11 flex-1 items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50">
-        Registrar en Garaje
-      </button>
+      <fieldset hlmFieldSet>
+        <legend hlmFieldLegend variant="label" class="font-mono text-xs uppercase tracking-widest">
+          03 // Fotografía &amp; Sensores
+        </legend>
+
+        <hlm-field>
+          <label hlmFieldLabel for="garage-photo">Fotografía Principal de Portada</label>
+          <input hlmInput id="garage-photo" type="file" accept="image/*" />
+          <hlm-field-description>Resolución recomendada: 1920x1080px (máx 15MB)</hlm-field-description>
+        </hlm-field>
+
+        <hlm-field orientation="horizontal">
+          <hlm-checkbox inputId="garage-obd" formControlName="obd" />
+          <div class="flex flex-col gap-1">
+            <label hlmLabel for="garage-obd">Vincular con OBD-II / Garmin Connect</label>
+            <hlm-field-description>
+              Sincroniza presiones de neumáticos, temperatura del refrigerante y consumo por ruta en tiempo real.
+            </hlm-field-description>
+          </div>
+        </hlm-field>
+      </fieldset>
     </div>
 
-    <p
-      class="flex items-center justify-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.08em] text-muted-foreground">
-      <ng-icon name="lucideShieldCheck" class="size-3" aria-hidden="true" />
-      Seguridad cifrada TLS 1.3 · Telemetría compatible Euro 5 / 5+
-    </p>
+    <hlm-card-footer class="flex-col items-stretch gap-3 border-t">
+      <button hlmBtn type="submit" size="lg" class="w-full">Registrar en Garaje</button>
+      <p class="flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+        <ng-icon name="lucideShieldCheck" class="size-3" aria-hidden="true" />
+        Seguridad cifrada TLS 1.3 · Telemetría compatible Euro 5 / 5+
+      </p>
+    </hlm-card-footer>
   </form>
-</div>
-}
 
-<div class="rounded-lg border border-border/60 bg-card p-4">
-  <div class="flex items-center justify-between gap-2">
-    <p class="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+<hlm-card size="sm" class="gap-0 py-0">
+  <div hlmCardContent class="flex items-center justify-between gap-2 py-4">
+    <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground">
       Montura secundaria · En garaje
     </p>
-    <span
-      class="rounded border border-border/60 bg-white/[0.04] px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-muted-foreground">
-      Standby
-    </span>
+    <hlm-badge variant="outline">Standby</hlm-badge>
   </div>
-
-  <div class="mt-3 flex items-center gap-3">
-    <!-- Cambio de imagen de moto secundaria -->
-    <!-- <figure class="relative size-16 shrink-0 overflow-hidden rounded border border-border/60 bg-black">
-      <img [ngSrc]="secondaryBike().image" fill [alt]="secondaryBike().imageAlt" sizes="64px" class="object-cover" />
-    </figure>
-    <div class="flex min-w-0 flex-col gap-0.5">
-      <p class="truncate text-sm font-semibold text-foreground">{{ secondaryBike().name }}</p>
-      <p class="font-mono text-[10px] text-muted-foreground">
-        {{ secondaryBike().displacement }} · {{ secondaryBike().power }} ·
-        {{ secondaryBike().year }}
-      </p>
-      <p class="font-mono text-[10px] text-muted-foreground">
-        <span class="text-foreground">{{ secondaryBike().odometer }} km</span> acumulados
-      </p>
-    </div>
-  </div>
-
-  <button type="button"
-    class="mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-border/60 bg-white/[0.03] text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-    (click)="setPrimaryBike(secondaryBike().id)">
-    <ng-icon name="lucideArrowRightLeft" class="size-3.5" aria-hidden="true" />
-    Activar como Montura Principal
-  </button> -->
-  </div>
-</div>
-
+</hlm-card>
