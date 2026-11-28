@@ -26,10 +26,6 @@ export class UserBikeForm {
     this.registerOpen.set(true);
   }
 
-  protected closeRegister(): void {
-    this.registerOpen.set(false);
-  }
-
   private readonly formBuilder = inject(FormBuilder);
 
 

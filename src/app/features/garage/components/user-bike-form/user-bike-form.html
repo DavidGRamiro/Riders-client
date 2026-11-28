@@ -1,3 +1,4 @@
+<div class="flex flex-col gap-4">
 @if (registerOpen()) {
 <div class="overflow-hidden rounded-lg border border-border/60 bg-card">
   <div class="flex items-start justify-between gap-3 border-b border-border/60 p-4">
@@ -13,11 +14,6 @@
         Añade una montura a tu flota para vincular telemetría OBD y consumo de rutas.
       </p>
     </div>
-    <button type="button"
-      class="flex size-7 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-      aria-label="Cerrar formulario de alta" (click)="closeRegister()">
-      <ng-icon name="lucideX" class="size-4" aria-hidden="true" />
-    </button>
   </div>
 
   <form [formGroup]="registerForm" (ngSubmit)="registerBike()" class="flex flex-col gap-5 p-4">
@@ -151,11 +147,6 @@
         class="inline-flex h-11 flex-1 items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50">
         Registrar en Garaje
       </button>
-      <button type="button"
-        class="inline-flex h-11 flex-1 items-center justify-center rounded-md bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-        (click)="closeRegister()">
-        Cancelar
-      </button>
     </div>
 
     <p
@@ -201,4 +192,6 @@
     <ng-icon name="lucideArrowRightLeft" class="size-3.5" aria-hidden="true" />
     Activar como Montura Principal
   </button> -->
+  </div>
 </div>
+
